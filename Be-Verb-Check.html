@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="description" content="Be Verb Check - 中1向け be動詞（am/is/are）判別ゲーム。iPad 単体起動版。">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Be Verb Check">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Be Verb Check</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* =========================================================
+   Foundation tokens (variables.css 同期領域より抜粋)
+   ========================================================= */
+:root {
+  --primary-color: #006064;
+  --secondary-color: #00838F;
+  --accent-color: #546E7A;
+  --background-color: #FFF8E7;
+  --text-color: #000000;
+  --white: #ffffff;
+  --gray-lightest: #fafafa;
+  --gray-lighter: #f9f9f9;
+  --gray-light: #f0f0f0;
+  --gray: #e0e0e0;
+  --gray-dark: #999;
+  --gray-darker: #666;
+  --gray-darkest: #000000;
+  --success-color: #4CAF50;
+  --warning-color: #F57C00;
+  --danger-color: #F44336;
+  --info-color: #0097A7;
+  --border-radius: 8px;
+  --border-radius-large: 12px;
+  --border-radius-small: 4px;
+  --shadow-small: 0 2px 5px rgba(0, 0, 0, 0.05);
+  --shadow-medium: 0 2px 10px rgba(0, 0, 0, 0.05);
+  --shadow-large: 0 4px 15px rgba(0, 55, 100, 0.15);
+  --shadow-xlarge: 0 10px 40px rgba(0, 0, 0, 0.1);
+  --spacing-xs: 5px;
+  --spacing-sm: 10px;
+  --spacing-md: 15px;
+  --spacing-lg: 20px;
+  --spacing-xl: 30px;
+  --spacing-xxl: 40px;
+  --font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', Tahoma, sans-serif;
+  --font-family-mono: 'Courier New', monospace;
+  --transition-smooth: all 0.3s ease;
+}
+
+/* =========================================================
+   Brand tokens ("放課後の遊び場" / brand.css)
+   ========================================================= */
+:root {
+  --gym-color-primary:   var(--primary-color);
+  --gym-color-secondary: var(--secondary-color);
+  --gym-color-success:   var(--success-color);
+  --gym-color-error:     var(--danger-color);
+  --gym-color-text-strong: #1A1A1A;
+  --gym-color-accent-warm:    #FF8A65;
+  --gym-color-accent-warm-2:  #FFAB40;
+  --gym-color-accent-pop:     #FFD54F;
+  --gym-color-accent-pop-2:   #FFEE58;
+  --gym-color-accent-fresh:   #80DEEA;
+  --gym-color-accent-fresh-2: #B2EBF2;
+  --gym-color-accent-fresh-3: #E0F7FA;
+  --gym-color-text-soft: #6D5D4B;
+  --gym-color-bg-base: #FFF8E7;
+  --gym-color-bg-playground: linear-gradient(160deg, #FFF8E7 0%, #FFE0B2 50%, #FFCCBC 100%);
+  --gym-color-bg-fresh: linear-gradient(160deg, #E0F7FA 0%, #B2EBF2 60%, #80DEEA 100%);
+  --gym-font-display: 'Fredoka', 'Nunito', 'Quicksand', 'Hiragino Maru Gothic ProN', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  --gym-font-numeric: 'Nunito', 'Segoe UI', sans-serif;
+  --gym-shadow-sticker: 2px 3px 0 rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.08);
+  --gym-shadow-sticker-soft: 1px 2px 0 rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+  --gym-radius: var(--border-radius);
+  --gym-radius-large: var(--border-radius-large);
+  --gym-radius-pill: 999px;
+  --gym-motion-fast:   120ms cubic-bezier(0.4, 0, 0.2, 1);
+  --gym-motion-medium: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --gym-motion-pop:    500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --gym-motion-idle:   2.4s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --gym-motion-fast:   0.01ms linear;
+    --gym-motion-medium: 0.01ms linear;
+    --gym-motion-pop:    0.01ms linear;
+    --gym-motion-idle:   0.01ms linear;
+  }
+}
+
+/* =========================================================
+   iPad 単体起動用のページ枠（site-wrapper 等は廃止）
+   ========================================================= */
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0a1f22;
+  background: radial-gradient(ellipse at center, #0d3d40 0%, #051518 70%, #000 100%);
+  font-family: var(--font-family);
+  color: var(--text-color);
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* ----- 縦持ち時の案内 ----- */
+.orientation-warning {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #051518;
+  color: var(--white);
+  z-index: 999;
+  text-align: center;
+  padding: 40px 24px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--gym-font-display);
+}
+.orientation-warning .rot {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: rot-wiggle 1.6s ease-in-out infinite;
+}
+.orientation-warning h1 {
+  font-size: 24px;
+  margin: 0 0 8px;
+  letter-spacing: 1px;
+}
+.orientation-warning p {
+  margin: 0;
+  font-size: 16px;
+  color: #B2EBF2;
+  font-weight: 600;
+}
+@keyframes rot-wiggle {
+  0%, 100% { transform: rotate(-10deg); }
+  50%      { transform: rotate(10deg); }
+}
+@media (orientation: portrait) {
+  .orientation-warning { display: flex; }
+}
+
+/* =========================================================
+   game-container — 768×432 完全固定（base.css から抜粋）
+   ========================================================= */
+.game-container {
+  width: 768px;
+  height: 432px;
+  position: relative;
+  overflow: hidden;
+  border: 4px solid #00BCD4;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* iPad 横向きで game-container が画面より大きい場合に等比スケール */
+@media (orientation: landscape) {
+  /* iPad mini 横 1024×768、Air/Pro 11" 1180×820、Pro 12.9" 1366×1024 — 余裕あり */
+  /* それでも全画面感を出すためビューポート高さに応じて等比スケール */
+}
+@media (max-height: 500px) {
+  .game-container {
+    transform: scale(calc(100vh / 460));
+    transform-origin: center center;
+  }
+}
+@media (min-height: 501px) and (max-height: 700px) {
+  .game-container {
+    transform: scale(1.3);
+    transform-origin: center center;
+  }
+}
+@media (min-height: 701px) and (max-height: 900px) {
+  .game-container {
+    transform: scale(1.6);
+    transform-origin: center center;
+  }
+}
+@media (min-height: 901px) {
+  .game-container {
+    transform: scale(1.9);
+    transform-origin: center center;
+  }
+}
+
+/* =========================================================
+   Be Verb Check ゲーム独自スタイル（style.css 全体）
+   ========================================================= */
+.bvc-game {
+  background: var(--gym-color-bg-playground);
+  font-family: 'Quicksand', 'Nunito', 'Segoe UI', sans-serif;
+  color: var(--gym-color-text-strong);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+}
+
+.bvc-game .screen {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+.bvc-game .screen.active { display: flex; }
+.bvc-game [hidden] { display: none !important; }
+
+/* ---------- Start Screen ---------- */
+#start-screen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 32px 18px;
+}
+.start-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+.title-area { text-align: center; margin-top: 4px; }
+.game-title {
+  font-family: var(--gym-font-display);
+  font-size: 44px;
+  font-weight: 800;
+  color: var(--gym-color-primary);
+  margin: 0;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.6);
+}
+.game-subtitle {
+  font-size: 15px;
+  color: var(--gym-color-text-soft);
+  margin: 6px 0 0;
+  font-weight: 600;
+}
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  width: 100%;
+  max-width: 560px;
+  margin: 8px 0;
+}
+.mode-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  padding: 18px 22px;
+  background: var(--white);
+  border: 2px solid var(--gym-color-accent-warm-2);
+  border-radius: var(--gym-radius-large);
+  box-shadow: var(--gym-shadow-sticker);
+  cursor: pointer;
+  transition: transform var(--gym-motion-fast), box-shadow var(--gym-motion-fast), border-color var(--gym-motion-fast);
+  min-height: 92px;
+  font-family: inherit;
+  text-align: left;
+}
+.mode-btn:hover, .mode-btn:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--gym-color-accent-warm);
+  outline: none;
+}
+.mode-btn:active {
+  transform: translateY(1px);
+  box-shadow: var(--gym-shadow-sticker-soft);
+}
+.mode-name {
+  font-family: var(--gym-font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--gym-color-primary);
+}
+.mode-desc { font-size: 13px; color: var(--gym-color-text-soft); font-weight: 600; }
+.mode-hint { font-size: 12px; color: var(--gym-color-accent-warm); font-weight: 700; margin-top: 2px; }
+.start-footer { width: 100%; display: flex; justify-content: center; align-items: center; }
+.sound-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--gym-color-text-soft);
+  font-weight: 600;
+  cursor: pointer;
+}
+.sound-toggle input { accent-color: var(--gym-color-accent-warm); }
+
+/* ---------- Game Screen ---------- */
+#game-screen { flex-direction: column; padding: 14px 28px 18px; gap: 8px; }
+.hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: var(--gym-radius-large);
+  box-shadow: var(--gym-shadow-sticker-soft);
+  box-sizing: border-box;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.hud-item { display: flex; align-items: baseline; gap: 6px; }
+.hud-label {
+  font-size: 12px;
+  color: var(--gym-color-text-soft);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.hud-value {
+  font-family: var(--gym-font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--gym-color-primary);
+}
+.question-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  text-align: center;
+}
+.sentence {
+  font-family: var(--gym-font-display);
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--gym-color-text-strong);
+  margin: 0;
+  line-height: 1.25;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.blank {
+  display: inline-block;
+  min-width: 90px;
+  padding: 0 6px;
+  margin: 0 4px;
+  color: var(--gym-color-accent-warm);
+  border-bottom: 4px solid var(--gym-color-accent-warm-2);
+  transition: color var(--gym-motion-medium);
+}
+.blank.correct {
+  color: var(--success-color);
+  border-bottom-color: var(--success-color);
+  animation: blank-pop var(--gym-motion-medium);
+}
+.blank.wrong {
+  color: var(--danger-color);
+  border-bottom-color: var(--danger-color);
+  animation: blank-shake var(--gym-motion-medium);
+}
+@keyframes blank-pop {
+  0%   { transform: scale(0.85); opacity: 0.3; }
+  60%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1.00); opacity: 1; }
+}
+@keyframes blank-shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-6px); }
+  50%      { transform: translateX(6px); }
+  75%      { transform: translateX(-3px); }
+}
+.feedback {
+  margin: 8px 0 0;
+  min-height: 18px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gym-color-text-soft);
+}
+.feedback.correct { color: var(--success-color); }
+.feedback.wrong   { color: var(--danger-color); }
+
+.answer-area {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 4px 0 2px;
+  box-sizing: border-box;
+}
+.choice-btn {
+  flex: 1;
+  max-width: 180px;
+  padding: 14px 8px;
+  font-family: var(--gym-font-display);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--gym-color-primary);
+  background: var(--white);
+  border: 2px solid var(--gym-color-accent-warm-2);
+  border-radius: var(--gym-radius-large);
+  box-shadow: var(--gym-shadow-sticker);
+  cursor: pointer;
+  transition: transform var(--gym-motion-fast), box-shadow var(--gym-motion-fast), border-color var(--gym-motion-fast), background var(--gym-motion-fast);
+}
+.choice-btn:hover:not(:disabled), .choice-btn:focus-visible:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--gym-color-accent-warm);
+  background: #FFF8E7;
+  outline: none;
+}
+.choice-btn:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: var(--gym-shadow-sticker-soft);
+}
+.choice-btn:disabled { cursor: default; opacity: 0.55; }
+.choice-btn.is-correct {
+  background: #E8F5E9;
+  border-color: var(--success-color);
+  color: var(--success-color);
+  opacity: 1;
+}
+.choice-btn.is-wrong {
+  background: #FFEBEE;
+  border-color: var(--danger-color);
+  color: var(--danger-color);
+  opacity: 1;
+}
+
+.answer-type { flex-direction: column; gap: 6px; }
+.type-input {
+  width: 240px;
+  max-width: 80%;
+  padding: 12px 16px;
+  font-family: var(--gym-font-display);
+  font-size: 26px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--gym-color-primary);
+  background: var(--white);
+  border: 2px solid var(--gym-color-accent-warm-2);
+  border-radius: var(--gym-radius-large);
+  box-shadow: var(--gym-shadow-sticker);
+  outline: none;
+  transition: border-color var(--gym-motion-fast), background var(--gym-motion-fast);
+}
+.type-input:focus {
+  border-color: var(--gym-color-accent-warm);
+  background: #FFF8E7;
+}
+.type-input.is-correct {
+  border-color: var(--success-color);
+  background: #E8F5E9;
+  color: var(--success-color);
+}
+.type-input.is-wrong {
+  border-color: var(--danger-color);
+  background: #FFEBEE;
+  color: var(--danger-color);
+}
+.type-hint { font-size: 12px; color: var(--gym-color-text-soft); font-weight: 600; }
+
+/* ---------- Result Screen ---------- */
+#result-screen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 32px;
+}
+.result-content {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+.rank-display { text-align: center; }
+.rank-stars {
+  display: block;
+  font-size: 40px;
+  line-height: 1;
+  color: var(--gym-color-accent-pop);
+  letter-spacing: 6px;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+  animation: rank-pop var(--gym-motion-pop);
+}
+@keyframes rank-pop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  60%  { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1.0); opacity: 1; }
+}
+.rank-title {
+  font-family: var(--gym-font-display);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--gym-color-primary);
+  margin: 6px 0 0;
+  letter-spacing: 1px;
+}
+.result-stats {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: var(--gym-radius-large);
+  box-shadow: var(--gym-shadow-sticker-soft);
+  box-sizing: border-box;
+}
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 16px;
+}
+.stat-label { color: var(--gym-color-text-soft); font-weight: 700; }
+.stat-value {
+  font-family: var(--gym-font-numeric);
+  font-variant-numeric: tabular-nums;
+  color: var(--gym-color-primary);
+  font-weight: 800;
+  font-size: 20px;
+}
+.result-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  justify-content: center;
+}
+.action-btn {
+  padding: 10px 20px;
+  font-family: var(--gym-font-display);
+  font-size: 16px;
+  font-weight: 800;
+  border: 2px solid var(--gym-color-accent-warm-2);
+  border-radius: var(--gym-radius-large);
+  box-shadow: var(--gym-shadow-sticker);
+  cursor: pointer;
+  transition: transform var(--gym-motion-fast), box-shadow var(--gym-motion-fast), background var(--gym-motion-fast);
+  min-width: 150px;
+}
+.action-btn.primary {
+  background: var(--gym-color-accent-warm);
+  color: var(--white);
+  border-color: var(--gym-color-accent-warm);
+}
+.action-btn.secondary {
+  background: var(--white);
+  color: var(--gym-color-primary);
+}
+.action-btn:hover, .action-btn:focus-visible {
+  transform: translateY(-2px);
+  outline: none;
+}
+.action-btn:active {
+  transform: translateY(1px);
+  box-shadow: var(--gym-shadow-sticker-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blank.correct, .blank.wrong, .rank-stars { animation: none; }
+  .mode-btn, .choice-btn, .action-btn, .type-input { transition: none; }
+  .mode-btn:hover, .choice-btn:hover:not(:disabled), .action-btn:hover { transform: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="orientation-warning" role="alert" aria-live="assertive">
+  <div class="rot">📱↻</div>
+  <h1>Please rotate</h1>
+  <p>iPad を横向きにしてください</p>
+</div>
+
+<div class="game-container bvc-game">
+
+  <!-- ===== Start Screen ===== -->
+  <div id="start-screen" class="screen active">
+    <div class="start-content">
+      <div class="title-area">
+        <h1 class="game-title">Be Verb Check</h1>
+        <p class="game-subtitle">主語に合う be動詞を答えよう</p>
+      </div>
+      <div class="mode-grid">
+        <button class="mode-btn" data-mode="tap" type="button">
+          <span class="mode-name">Tap Mode</span>
+          <span class="mode-desc">3つから選ぶ</span>
+          <span class="mode-hint">am / is / are</span>
+        </button>
+        <button class="mode-btn" data-mode="type" type="button">
+          <span class="mode-name">Type Mode</span>
+          <span class="mode-desc">入力して答える</span>
+          <span class="mode-hint">キーボードで答えよう</span>
+        </button>
+      </div>
+      <div class="start-footer">
+        <label class="sound-toggle">
+          <input type="checkbox" id="sound-toggle" checked>
+          <span>サウンド</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Game Screen ===== -->
+  <div id="game-screen" class="screen">
+    <div class="hud">
+      <div class="hud-item hud-progress">
+        <span class="hud-label">Q</span>
+        <span class="hud-value"><span id="q-current">1</span> / <span id="q-total">10</span></span>
+      </div>
+      <div class="hud-item hud-time">
+        <span class="hud-label">Time</span>
+        <span class="hud-value" id="time-value">00:00</span>
+      </div>
+    </div>
+    <div class="question-area">
+      <p class="sentence" id="sentence-text">
+        <span class="sentence-pre" id="sentence-pre"></span><span class="blank" id="blank-slot">___</span><span class="sentence-post" id="sentence-post"></span>
+      </p>
+      <p class="feedback" id="feedback-text" aria-live="polite"></p>
+    </div>
+    <div class="answer-area answer-tap" id="answer-tap">
+      <button class="choice-btn" data-choice="am" type="button">am</button>
+      <button class="choice-btn" data-choice="is" type="button">is</button>
+      <button class="choice-btn" data-choice="are" type="button">are</button>
+    </div>
+    <div class="answer-area answer-type" id="answer-type" hidden>
+      <input type="text" id="type-input" class="type-input"
+             inputmode="latin"
+             autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+             maxlength="6" placeholder="am / is / are"
+             aria-label="be動詞を入力">
+      <span class="type-hint">Enter で答える</span>
+    </div>
+  </div>
+
+  <!-- ===== Result Screen ===== -->
+  <div id="result-screen" class="screen">
+    <div class="result-content">
+      <div class="rank-display">
+        <span class="rank-stars" id="rank-stars">★</span>
+        <h2 class="rank-title" id="rank-title">もう一回</h2>
+      </div>
+      <div class="result-stats">
+        <div class="stat-row">
+          <span class="stat-label">スコア</span>
+          <span class="stat-value"><span id="result-score">0</span> / 10</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">タイム</span>
+          <span class="stat-value" id="result-time">00:00</span>
+        </div>
+      </div>
+      <div class="result-actions">
+        <button id="retry-btn" class="action-btn primary" type="button">もう一度</button>
+        <button id="back-btn" class="action-btn secondary" type="button">モード選択へ</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   GymSfx — 共通効果音モジュール（sfx.js inline 化）
+   ========================================================= */
+(function (root) {
+  'use strict';
+  let audioCtx = null;
+  let enabled = true;
+  let _masterVolume = 0.6;
+  const _relativeVolume = { ping: 1.0, miss: 0.8, clear: 1.1 };
+  const _buffers = { ping: null, miss: null, clear: null };
+
+  function init() {
+    if (audioCtx) return audioCtx;
+    try { audioCtx = new (root.AudioContext || root.webkitAudioContext)(); }
+    catch (_) { audioCtx = null; }
+    return audioCtx;
+  }
+  function setEnabled(flag) { enabled = !!flag; if (enabled) init(); }
+  function isEnabled() { return enabled; }
+  function setMasterVolume(v) {
+    if (typeof v !== 'number' || isNaN(v)) return;
+    _masterVolume = Math.max(0, Math.min(1, v));
+  }
+  function _gainFor(kind) { return _masterVolume * (_relativeVolume[kind] || 1.0); }
+
+  function _makeEnvelope(gainNode, startTime, attack, decay, sustain, release, peakGain) {
+    const g = gainNode.gain;
+    g.cancelScheduledValues(startTime);
+    g.setValueAtTime(0.0001, startTime);
+    g.exponentialRampToValueAtTime(Math.max(0.0001, peakGain), startTime + attack);
+    g.exponentialRampToValueAtTime(Math.max(0.0001, peakGain * sustain), startTime + attack + decay);
+    g.exponentialRampToValueAtTime(0.0001, startTime + attack + decay + release);
+  }
+  function _scheduleTone(opts) {
+    const t = opts.startTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = opts.type || 'sine';
+    if (typeof opts.freq === 'number') osc.frequency.setValueAtTime(opts.freq, t);
+    else if (Array.isArray(opts.freq)) {
+      osc.frequency.setValueAtTime(opts.freq[0], t);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(1, opts.freq[1]), t + (opts.freq[2] || 0.05));
+    }
+    _makeEnvelope(gain, t, opts.attack || 0.005, opts.decay || 0.04,
+      opts.sustain != null ? opts.sustain : 0.3, opts.release || 0.08, opts.peakGain || 0.1);
+    osc.connect(gain);
+    gain.connect(opts.destination || audioCtx.destination);
+    const totalDur = (opts.attack || 0.005) + (opts.decay || 0.04) + (opts.release || 0.08) + 0.02;
+    osc.start(t); osc.stop(t + totalDur);
+    osc.onended = () => { try { osc.disconnect(); gain.disconnect(); } catch (_) {} };
+    return { osc, gain };
+  }
+  function _synthPing() {
+    const t = audioCtx.currentTime;
+    const peak = 0.18 * _gainFor('ping');
+    const bus = audioCtx.createGain(); bus.gain.value = 1.0;
+    const lp = audioCtx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 6000; lp.Q.value = 0.7;
+    bus.connect(lp); lp.connect(audioCtx.destination);
+    _scheduleTone({ startTime: t, type: 'sine', freq: [1100, 1320, 0.04], attack: 0.004, decay: 0.05, sustain: 0.35, release: 0.14, peakGain: peak, destination: bus });
+    _scheduleTone({ startTime: t, type: 'sine', freq: [1650, 1980, 0.04], attack: 0.004, decay: 0.04, sustain: 0.25, release: 0.10, peakGain: peak * 0.5, destination: bus });
+    _scheduleTone({ startTime: t + 0.005, type: 'triangle', freq: 2640, attack: 0.003, decay: 0.03, sustain: 0.15, release: 0.06, peakGain: peak * 0.25, destination: bus });
+    setTimeout(() => { try { bus.disconnect(); lp.disconnect(); } catch (_) {} }, 400);
+  }
+  function _synthMiss() {
+    const t = audioCtx.currentTime;
+    const peak = 0.14 * _gainFor('miss');
+    const bus = audioCtx.createGain(); bus.gain.value = 1.0;
+    const lp = audioCtx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1500; lp.Q.value = 0.5;
+    bus.connect(lp); lp.connect(audioCtx.destination);
+    _scheduleTone({ startTime: t, type: 'triangle', freq: [240, 160, 0.10], attack: 0.005, decay: 0.04, sustain: 0.4, release: 0.10, peakGain: peak, destination: bus });
+    _scheduleTone({ startTime: t, type: 'sine', freq: [110, 80, 0.05], attack: 0.003, decay: 0.02, sustain: 0.2, release: 0.05, peakGain: peak * 0.6, destination: bus });
+    setTimeout(() => { try { bus.disconnect(); lp.disconnect(); } catch (_) {} }, 350);
+  }
+  function _synthClear() {
+    const t0 = audioCtx.currentTime;
+    const peak = 0.16 * _gainFor('clear');
+    const bus = audioCtx.createGain(); bus.gain.value = 1.0;
+    const lp = audioCtx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5000; lp.Q.value = 0.5;
+    bus.connect(lp); lp.connect(audioCtx.destination);
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    const stepSec = 0.13;
+    notes.forEach((freq, i) => {
+      const isLast = (i === notes.length - 1);
+      const tNote = t0 + i * stepSec;
+      _scheduleTone({ startTime: tNote, type: 'sine', freq: freq, attack: 0.008, decay: 0.05, sustain: 0.35, release: isLast ? 0.35 : 0.16, peakGain: peak, destination: bus });
+      _scheduleTone({ startTime: tNote, type: 'sine', freq: freq * 2, attack: 0.006, decay: 0.04, sustain: 0.2, release: isLast ? 0.30 : 0.12, peakGain: peak * 0.30, destination: bus });
+      _scheduleTone({ startTime: tNote, type: 'triangle', freq: freq * 3, attack: 0.005, decay: 0.03, sustain: 0.15, release: isLast ? 0.25 : 0.08, peakGain: peak * (isLast ? 0.18 : 0.10), destination: bus });
+    });
+    setTimeout(() => { try { bus.disconnect(); lp.disconnect(); } catch (_) {} }, 1500);
+  }
+  function playPing() { if (!enabled || !audioCtx) return; _synthPing(); }
+  function playMiss() { if (!enabled || !audioCtx) return; _synthMiss(); }
+  function playClear() { if (!enabled || !audioCtx) return; _synthClear(); }
+
+  root.GymSfx = { init, setEnabled, isEnabled, setMasterVolume, playPing, playMiss, playClear };
+})(window);
+
+/* =========================================================
+   BE_VERB_QUESTIONS — 出題プール 48問
+   ========================================================= */
+window.BE_VERB_QUESTIONS = [
+  { sentence: "I ___ a student.",              answer: "am", subject: "I" },
+  { sentence: "I ___ from Japan.",             answer: "am", subject: "I" },
+  { sentence: "I ___ thirteen years old.",     answer: "am", subject: "I" },
+  { sentence: "I ___ hungry now.",             answer: "am", subject: "I" },
+  { sentence: "You ___ kind.",                 answer: "are", subject: "You" },
+  { sentence: "You ___ a good singer.",        answer: "are", subject: "You" },
+  { sentence: "You ___ my best friend.",       answer: "are", subject: "You" },
+  { sentence: "You ___ very busy today.",      answer: "are", subject: "You" },
+  { sentence: "She ___ my sister.",            answer: "is", subject: "She" },
+  { sentence: "He ___ a soccer player.",       answer: "is", subject: "He" },
+  { sentence: "She ___ in the music club.",    answer: "is", subject: "She" },
+  { sentence: "He ___ tall and cool.",         answer: "is", subject: "He" },
+  { sentence: "It ___ a cat.",                 answer: "is", subject: "It" },
+  { sentence: "It ___ sunny today.",           answer: "is", subject: "It" },
+  { sentence: "It ___ my favorite book.",      answer: "is", subject: "It" },
+  { sentence: "It ___ a long pencil.",         answer: "is", subject: "It" },
+  { sentence: "We ___ classmates.",            answer: "are", subject: "We" },
+  { sentence: "We ___ in the same team.",      answer: "are", subject: "We" },
+  { sentence: "We ___ happy today.",           answer: "are", subject: "We" },
+  { sentence: "We ___ from Osaka.",            answer: "are", subject: "We" },
+  { sentence: "They ___ from Tokyo.",          answer: "are", subject: "They" },
+  { sentence: "They ___ good tennis players.", answer: "are", subject: "They" },
+  { sentence: "They ___ my classmates.",       answer: "are", subject: "They" },
+  { sentence: "They ___ very kind to me.",     answer: "are", subject: "They" },
+  { sentence: "This ___ my pen.",              answer: "is", subject: "This" },
+  { sentence: "That ___ a big tree.",          answer: "is", subject: "That" },
+  { sentence: "This ___ a new bag.",           answer: "is", subject: "This" },
+  { sentence: "That ___ my school.",           answer: "is", subject: "That" },
+  { sentence: "These ___ apples.",             answer: "are", subject: "These" },
+  { sentence: "Those ___ my notebooks.",       answer: "are", subject: "Those" },
+  { sentence: "These ___ new shoes.",          answer: "are", subject: "These" },
+  { sentence: "Those ___ beautiful flowers.",  answer: "are", subject: "Those" },
+  { sentence: "Tom ___ tall.",                 answer: "is", subject: "Tom" },
+  { sentence: "Ms. Sato ___ our English teacher.", answer: "is", subject: "Ms. Sato" },
+  { sentence: "Ken ___ a baseball fan.",       answer: "is", subject: "Ken" },
+  { sentence: "Yuki ___ good at math.",        answer: "is", subject: "Yuki" },
+  { sentence: "Tom and Ken ___ friends.",      answer: "are", subject: "Tom and Ken" },
+  { sentence: "Aya and Yuki ___ in the art club.", answer: "are", subject: "Aya and Yuki" },
+  { sentence: "Mr. Tanaka and Ms. Sato ___ teachers.", answer: "are", subject: "Mr. Tanaka and Ms. Sato" },
+  { sentence: "Bob and I ___ on the same team.", answer: "are", subject: "Bob and I" },
+  { sentence: "My mother ___ a teacher.",      answer: "is", subject: "My mother" },
+  { sentence: "My dog ___ very cute.",         answer: "is", subject: "My dog" },
+  { sentence: "My brother ___ a high school student.", answer: "is", subject: "My brother" },
+  { sentence: "My bag ___ on the desk.",       answer: "is", subject: "My bag" },
+  { sentence: "My friends ___ kind.",          answer: "are", subject: "My friends" },
+  { sentence: "My parents ___ from Hokkaido.", answer: "are", subject: "My parents" },
+  { sentence: "My shoes ___ new.",             answer: "are", subject: "My shoes" },
+  { sentence: "My cats ___ on the sofa.",      answer: "are", subject: "My cats" }
+];
+
+/* =========================================================
+   Be Verb Check — メインロジック（app.js inline 化）
+   ========================================================= */
+(function () {
+  'use strict';
+  const TOTAL_QUESTIONS = 10;
+  const VALID_ANSWERS = ['am', 'is', 'are'];
+  const FEEDBACK_DELAY_CORRECT = 600;
+  const FEEDBACK_DELAY_WRONG = 1200;
+
+  const state = {
+    mode: null,
+    questions: [],
+    currentIndex: 0,
+    score: 0,
+    startTime: 0,
+    elapsedMs: 0,
+    timerHandle: null,
+    locked: false,
+    nextHandle: null
+  };
+  const dom = {};
+
+  document.addEventListener('DOMContentLoaded', init);
+
+  function init() {
+    if (!Array.isArray(window.BE_VERB_QUESTIONS) || window.BE_VERB_QUESTIONS.length < TOTAL_QUESTIONS) {
+      console.error('[BeVerbCheck] 出題データが不足しています');
+      return;
+    }
+    dom.startScreen  = document.getElementById('start-screen');
+    dom.gameScreen   = document.getElementById('game-screen');
+    dom.resultScreen = document.getElementById('result-screen');
+    dom.modeButtons  = document.querySelectorAll('.mode-btn');
+    dom.soundToggle  = document.getElementById('sound-toggle');
+    dom.qCurrent     = document.getElementById('q-current');
+    dom.qTotal       = document.getElementById('q-total');
+    dom.timeValue    = document.getElementById('time-value');
+    dom.sentencePre  = document.getElementById('sentence-pre');
+    dom.blankSlot    = document.getElementById('blank-slot');
+    dom.sentencePost = document.getElementById('sentence-post');
+    dom.feedbackText = document.getElementById('feedback-text');
+    dom.answerTap    = document.getElementById('answer-tap');
+    dom.answerType   = document.getElementById('answer-type');
+    dom.choiceBtns   = document.querySelectorAll('.choice-btn');
+    dom.typeInput    = document.getElementById('type-input');
+    dom.rankStars    = document.getElementById('rank-stars');
+    dom.rankTitle    = document.getElementById('rank-title');
+    dom.resultScore  = document.getElementById('result-score');
+    dom.resultTime   = document.getElementById('result-time');
+    dom.retryBtn     = document.getElementById('retry-btn');
+    dom.backBtn      = document.getElementById('back-btn');
+
+    if (dom.qTotal) dom.qTotal.textContent = String(TOTAL_QUESTIONS);
+
+    dom.modeButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const mode = btn.getAttribute('data-mode');
+        if (mode === 'tap' || mode === 'type') startGame(mode);
+      });
+    });
+
+    if (dom.soundToggle && window.GymSfx) {
+      window.GymSfx.setEnabled(!!dom.soundToggle.checked);
+      dom.soundToggle.addEventListener('change', () => {
+        window.GymSfx.setEnabled(!!dom.soundToggle.checked);
+        if (dom.soundToggle.checked) window.GymSfx.init();
+      });
+    }
+
+    dom.choiceBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (state.locked || state.mode !== 'tap') return;
+        const choice = btn.getAttribute('data-choice');
+        handleAnswer(choice);
+      });
+    });
+
+    if (dom.typeInput) {
+      dom.typeInput.addEventListener('keydown', (e) => {
+        if (state.locked || state.mode !== 'type') return;
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const value = (dom.typeInput.value || '').trim().toLowerCase();
+          if (value.length === 0) return;
+          handleAnswer(value);
+        }
+      });
+    }
+
+    if (dom.retryBtn) dom.retryBtn.addEventListener('click', () => { if (state.mode) startGame(state.mode); });
+    if (dom.backBtn)  dom.backBtn.addEventListener('click', () => { showScreen('start'); });
+  }
+
+  function startGame(mode) {
+    cleanupTimers();
+    state.mode = mode;
+    state.questions = pickQuestions(TOTAL_QUESTIONS);
+    state.currentIndex = 0;
+    state.score = 0;
+    state.locked = false;
+    state.startTime = performance.now();
+    state.elapsedMs = 0;
+    if (window.GymSfx) window.GymSfx.init();
+
+    if (mode === 'tap') {
+      dom.answerTap.hidden = false;
+      dom.answerType.hidden = true;
+    } else {
+      dom.answerTap.hidden = true;
+      dom.answerType.hidden = false;
+    }
+    showScreen('game');
+    startTimer();
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    const q = state.questions[state.currentIndex];
+    if (!q) { endGame(); return; }
+    if (dom.qCurrent) dom.qCurrent.textContent = String(state.currentIndex + 1);
+    const parts = q.sentence.split('___');
+    dom.sentencePre.textContent = parts[0] || '';
+    dom.sentencePost.textContent = parts[1] || '';
+    dom.blankSlot.textContent = '___';
+    dom.blankSlot.classList.remove('correct', 'wrong');
+    dom.feedbackText.textContent = '';
+    dom.feedbackText.classList.remove('correct', 'wrong');
+    dom.choiceBtns.forEach((btn) => {
+      btn.classList.remove('is-correct', 'is-wrong');
+      btn.disabled = false;
+    });
+    if (dom.typeInput) {
+      dom.typeInput.value = '';
+      dom.typeInput.classList.remove('is-correct', 'is-wrong');
+      dom.typeInput.disabled = false;
+    }
+    state.locked = false;
+    if (state.mode === 'type' && dom.typeInput) {
+      setTimeout(() => { try { dom.typeInput.focus(); } catch (_) {} }, 30);
+    }
+  }
+
+  function handleAnswer(rawAnswer) {
+    if (state.locked) return;
+    const q = state.questions[state.currentIndex];
+    if (!q) return;
+    const answer = String(rawAnswer || '').trim().toLowerCase();
+    if (!VALID_ANSWERS.includes(answer)) { judgeWrong(q, answer); return; }
+    if (answer === q.answer) judgeCorrect(q);
+    else judgeWrong(q, answer);
+  }
+
+  function judgeCorrect(q) {
+    state.locked = true;
+    state.score += 1;
+    dom.blankSlot.textContent = q.answer;
+    dom.blankSlot.classList.add('correct');
+    dom.feedbackText.textContent = 'Good!';
+    dom.feedbackText.classList.add('correct');
+    if (state.mode === 'tap') {
+      dom.choiceBtns.forEach((btn) => {
+        btn.disabled = true;
+        if (btn.getAttribute('data-choice') === q.answer) btn.classList.add('is-correct');
+      });
+    } else if (state.mode === 'type' && dom.typeInput) {
+      dom.typeInput.value = q.answer;
+      dom.typeInput.classList.add('is-correct');
+      dom.typeInput.disabled = true;
+    }
+    if (window.GymSfx) window.GymSfx.playPing();
+    scheduleNext(FEEDBACK_DELAY_CORRECT);
+  }
+
+  function judgeWrong(q, userAnswer) {
+    state.locked = true;
+    dom.blankSlot.textContent = q.answer;
+    dom.blankSlot.classList.add('wrong');
+    dom.feedbackText.textContent = '正解は "' + q.answer + '"';
+    dom.feedbackText.classList.add('wrong');
+    if (state.mode === 'tap') {
+      dom.choiceBtns.forEach((btn) => {
+        btn.disabled = true;
+        const choice = btn.getAttribute('data-choice');
+        if (choice === q.answer) btn.classList.add('is-correct');
+        else if (choice === userAnswer) btn.classList.add('is-wrong');
+      });
+    } else if (state.mode === 'type' && dom.typeInput) {
+      dom.typeInput.classList.add('is-wrong');
+      dom.typeInput.disabled = true;
+    }
+    if (window.GymSfx) window.GymSfx.playMiss();
+    scheduleNext(FEEDBACK_DELAY_WRONG);
+  }
+
+  function scheduleNext(delayMs) {
+    if (state.nextHandle) clearTimeout(state.nextHandle);
+    state.nextHandle = setTimeout(() => {
+      state.nextHandle = null;
+      state.currentIndex += 1;
+      if (state.currentIndex >= state.questions.length) endGame();
+      else renderQuestion();
+    }, delayMs);
+  }
+
+  function endGame() {
+    stopTimer();
+    state.elapsedMs = performance.now() - state.startTime;
+    const rank = decideRank(state.score);
+    dom.rankStars.textContent = rank.stars;
+    dom.rankTitle.textContent = rank.title;
+    dom.resultScore.textContent = String(state.score);
+    dom.resultTime.textContent = formatTime(state.elapsedMs);
+    if (window.GymSfx) window.GymSfx.playClear();
+    showScreen('result');
+  }
+
+  function pickQuestions(n) {
+    const groups = { am: [], is: [], are: [] };
+    window.BE_VERB_QUESTIONS.forEach((q) => {
+      if (groups[q.answer]) groups[q.answer].push(q);
+    });
+    const shuffle = (arr) => {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+      }
+    };
+    Object.keys(groups).forEach((k) => shuffle(groups[k]));
+    const quota = { am: 3, is: 4, are: 3 };
+    const picked = [];
+    Object.keys(quota).forEach((key) => {
+      const want = quota[key];
+      const avail = groups[key].slice(0, Math.min(want, groups[key].length));
+      picked.push(...avail);
+    });
+    if (picked.length < n) {
+      const used = new Set(picked);
+      const rest = window.BE_VERB_QUESTIONS.filter((q) => !used.has(q));
+      shuffle(rest);
+      picked.push(...rest.slice(0, n - picked.length));
+    }
+    shuffle(picked);
+    return picked.slice(0, n);
+  }
+
+  function decideRank(score) {
+    if (score >= 9) return { stars: '★★★', title: 'ネイティブ級' };
+    if (score >= 7) return { stars: '★★',   title: 'なかなかやる' };
+    return                  { stars: '★',     title: 'もう一回' };
+  }
+
+  function formatTime(ms) {
+    const total = Math.max(0, Math.floor(ms / 1000));
+    const m = Math.floor(total / 60);
+    const s = total % 60;
+    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  }
+
+  function startTimer() {
+    stopTimer();
+    state.timerHandle = setInterval(() => {
+      state.elapsedMs = performance.now() - state.startTime;
+      if (dom.timeValue) dom.timeValue.textContent = formatTime(state.elapsedMs);
+    }, 100);
+  }
+  function stopTimer() {
+    if (state.timerHandle) { clearInterval(state.timerHandle); state.timerHandle = null; }
+  }
+  function cleanupTimers() {
+    stopTimer();
+    if (state.nextHandle) { clearTimeout(state.nextHandle); state.nextHandle = null; }
+    state.locked = false;
+  }
+  function showScreen(name) {
+    const map = { start: dom.startScreen, game: dom.gameScreen, result: dom.resultScreen };
+    Object.keys(map).forEach((key) => {
+      const el = map[key];
+      if (!el) return;
+      if (key === name) el.classList.add('active');
+      else el.classList.remove('active');
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

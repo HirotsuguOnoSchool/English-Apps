@@ -671,7 +671,7 @@ body {
       <div class="result-stats">
         <div class="stat-row">
           <span class="stat-label">スコア</span>
-          <span class="stat-value"><span id="result-score">0</span> / 10</span>
+          <span class="stat-value"><span id="result-score">0</span> / 20</span>
         </div>
         <div class="stat-row">
           <span class="stat-label">タイム</span>
@@ -789,54 +789,107 @@ body {
    BE_VERB_QUESTIONS — 出題プール 48問
    ========================================================= */
 window.BE_VERB_QUESTIONS = [
-  { sentence: "I ___ a student.",              answer: "am", subject: "I" },
-  { sentence: "I ___ from Japan.",             answer: "am", subject: "I" },
-  { sentence: "I ___ thirteen years old.",     answer: "am", subject: "I" },
-  { sentence: "I ___ hungry now.",             answer: "am", subject: "I" },
-  { sentence: "You ___ kind.",                 answer: "are", subject: "You" },
-  { sentence: "You ___ a good singer.",        answer: "are", subject: "You" },
-  { sentence: "You ___ my best friend.",       answer: "are", subject: "You" },
-  { sentence: "You ___ very busy today.",      answer: "are", subject: "You" },
-  { sentence: "She ___ my sister.",            answer: "is", subject: "She" },
-  { sentence: "He ___ a soccer player.",       answer: "is", subject: "He" },
-  { sentence: "She ___ in the music club.",    answer: "is", subject: "She" },
-  { sentence: "He ___ tall and cool.",         answer: "is", subject: "He" },
-  { sentence: "It ___ a cat.",                 answer: "is", subject: "It" },
-  { sentence: "It ___ sunny today.",           answer: "is", subject: "It" },
-  { sentence: "It ___ my favorite book.",      answer: "is", subject: "It" },
-  { sentence: "It ___ a long pencil.",         answer: "is", subject: "It" },
-  { sentence: "We ___ classmates.",            answer: "are", subject: "We" },
-  { sentence: "We ___ in the same team.",      answer: "are", subject: "We" },
-  { sentence: "We ___ happy today.",           answer: "are", subject: "We" },
-  { sentence: "We ___ from Osaka.",            answer: "are", subject: "We" },
-  { sentence: "They ___ from Tokyo.",          answer: "are", subject: "They" },
-  { sentence: "They ___ good tennis players.", answer: "are", subject: "They" },
-  { sentence: "They ___ my classmates.",       answer: "are", subject: "They" },
-  { sentence: "They ___ very kind to me.",     answer: "are", subject: "They" },
-  { sentence: "This ___ my pen.",              answer: "is", subject: "This" },
-  { sentence: "That ___ a big tree.",          answer: "is", subject: "That" },
-  { sentence: "This ___ a new bag.",           answer: "is", subject: "This" },
-  { sentence: "That ___ my school.",           answer: "is", subject: "That" },
-  { sentence: "These ___ apples.",             answer: "are", subject: "These" },
-  { sentence: "Those ___ my notebooks.",       answer: "are", subject: "Those" },
-  { sentence: "These ___ new shoes.",          answer: "are", subject: "These" },
-  { sentence: "Those ___ beautiful flowers.",  answer: "are", subject: "Those" },
-  { sentence: "Tom ___ tall.",                 answer: "is", subject: "Tom" },
+  /* Pattern 1: I → am （8問） */
+  { sentence: "I ___ a student.",                 answer: "am", subject: "I" },
+  { sentence: "I ___ from Japan.",                answer: "am", subject: "I" },
+  { sentence: "I ___ thirteen years old.",        answer: "am", subject: "I" },
+  { sentence: "I ___ hungry now.",                answer: "am", subject: "I" },
+  { sentence: "I ___ a junior high school student.", answer: "am", subject: "I" },
+  { sentence: "I ___ in the tennis club.",        answer: "am", subject: "I" },
+  { sentence: "I ___ very tired today.",          answer: "am", subject: "I" },
+  { sentence: "I ___ happy to meet you.",         answer: "am", subject: "I" },
+
+  /* Pattern 2: You → are （6問） */
+  { sentence: "You ___ kind.",                    answer: "are", subject: "You" },
+  { sentence: "You ___ a good singer.",           answer: "are", subject: "You" },
+  { sentence: "You ___ my best friend.",          answer: "are", subject: "You" },
+  { sentence: "You ___ very busy today.",         answer: "are", subject: "You" },
+  { sentence: "You ___ a fast runner.",           answer: "are", subject: "You" },
+  { sentence: "You ___ welcome.",                 answer: "are", subject: "You" },
+
+  /* Pattern 3: He / She → is （8問） */
+  { sentence: "She ___ my sister.",               answer: "is", subject: "She" },
+  { sentence: "He ___ a soccer player.",          answer: "is", subject: "He" },
+  { sentence: "She ___ in the music club.",       answer: "is", subject: "She" },
+  { sentence: "He ___ tall and cool.",            answer: "is", subject: "He" },
+  { sentence: "He ___ from Australia.",           answer: "is", subject: "He" },
+  { sentence: "She ___ a kind girl.",             answer: "is", subject: "She" },
+  { sentence: "He ___ my brother.",               answer: "is", subject: "He" },
+  { sentence: "She ___ good at English.",         answer: "is", subject: "She" },
+
+  /* Pattern 4: It → is （6問） */
+  { sentence: "It ___ a cat.",                    answer: "is", subject: "It" },
+  { sentence: "It ___ sunny today.",              answer: "is", subject: "It" },
+  { sentence: "It ___ my favorite book.",         answer: "is", subject: "It" },
+  { sentence: "It ___ a long pencil.",            answer: "is", subject: "It" },
+  { sentence: "It ___ a big city.",               answer: "is", subject: "It" },
+  { sentence: "It ___ cold in winter.",           answer: "is", subject: "It" },
+
+  /* Pattern 5: We → are （6問） */
+  { sentence: "We ___ classmates.",               answer: "are", subject: "We" },
+  { sentence: "We ___ in the same team.",         answer: "are", subject: "We" },
+  { sentence: "We ___ happy today.",              answer: "are", subject: "We" },
+  { sentence: "We ___ from Osaka.",               answer: "are", subject: "We" },
+  { sentence: "We ___ ready for the game.",       answer: "are", subject: "We" },
+  { sentence: "We ___ good friends.",             answer: "are", subject: "We" },
+
+  /* Pattern 6: They → are （6問） */
+  { sentence: "They ___ from Tokyo.",             answer: "are", subject: "They" },
+  { sentence: "They ___ good tennis players.",    answer: "are", subject: "They" },
+  { sentence: "They ___ my classmates.",          answer: "are", subject: "They" },
+  { sentence: "They ___ very kind to me.",        answer: "are", subject: "They" },
+  { sentence: "They ___ in the science club.",    answer: "are", subject: "They" },
+  { sentence: "They ___ new students.",           answer: "are", subject: "They" },
+
+  /* Pattern 7: This / That → is （6問） */
+  { sentence: "This ___ my pen.",                 answer: "is", subject: "This" },
+  { sentence: "That ___ a big tree.",             answer: "is", subject: "That" },
+  { sentence: "This ___ a new bag.",              answer: "is", subject: "This" },
+  { sentence: "That ___ my school.",              answer: "is", subject: "That" },
+  { sentence: "This ___ a beautiful picture.",    answer: "is", subject: "This" },
+  { sentence: "That ___ his bicycle.",            answer: "is", subject: "That" },
+
+  /* Pattern 8: These / Those → are （6問） */
+  { sentence: "These ___ apples.",                answer: "are", subject: "These" },
+  { sentence: "Those ___ my notebooks.",          answer: "are", subject: "Those" },
+  { sentence: "These ___ new shoes.",             answer: "are", subject: "These" },
+  { sentence: "Those ___ beautiful flowers.",     answer: "are", subject: "Those" },
+  { sentence: "These ___ my favorite songs.",     answer: "are", subject: "These" },
+  { sentence: "Those ___ very old trees.",        answer: "are", subject: "Those" },
+
+  /* Pattern 9: 人名単数 → is （8問） */
+  { sentence: "Tom ___ tall.",                    answer: "is", subject: "Tom" },
   { sentence: "Ms. Sato ___ our English teacher.", answer: "is", subject: "Ms. Sato" },
-  { sentence: "Ken ___ a baseball fan.",       answer: "is", subject: "Ken" },
-  { sentence: "Yuki ___ good at math.",        answer: "is", subject: "Yuki" },
-  { sentence: "Tom and Ken ___ friends.",      answer: "are", subject: "Tom and Ken" },
+  { sentence: "Ken ___ a baseball fan.",          answer: "is", subject: "Ken" },
+  { sentence: "Yuki ___ good at math.",           answer: "is", subject: "Yuki" },
+  { sentence: "Mr. Tanaka ___ a music teacher.",  answer: "is", subject: "Mr. Tanaka" },
+  { sentence: "Aya ___ in the chorus club.",      answer: "is", subject: "Aya" },
+  { sentence: "Bob ___ from Canada.",             answer: "is", subject: "Bob" },
+  { sentence: "Emma ___ a new student.",          answer: "is", subject: "Emma" },
+
+  /* Pattern 10: 人名複数（X and Y）→ are （6問） */
+  { sentence: "Tom and Ken ___ friends.",         answer: "are", subject: "Tom and Ken" },
   { sentence: "Aya and Yuki ___ in the art club.", answer: "are", subject: "Aya and Yuki" },
   { sentence: "Mr. Tanaka and Ms. Sato ___ teachers.", answer: "are", subject: "Mr. Tanaka and Ms. Sato" },
-  { sentence: "Bob and I ___ on the same team.", answer: "are", subject: "Bob and I" },
-  { sentence: "My mother ___ a teacher.",      answer: "is", subject: "My mother" },
-  { sentence: "My dog ___ very cute.",         answer: "is", subject: "My dog" },
+  { sentence: "Bob and I ___ on the same team.",  answer: "are", subject: "Bob and I" },
+  { sentence: "Emma and I ___ in the same class.", answer: "are", subject: "Emma and I" },
+  { sentence: "Ken and Yuki ___ classmates.",     answer: "are", subject: "Ken and Yuki" },
+
+  /* Pattern 11: My + 単数名詞 → is （6問） */
+  { sentence: "My mother ___ a teacher.",         answer: "is", subject: "My mother" },
+  { sentence: "My dog ___ very cute.",            answer: "is", subject: "My dog" },
   { sentence: "My brother ___ a high school student.", answer: "is", subject: "My brother" },
-  { sentence: "My bag ___ on the desk.",       answer: "is", subject: "My bag" },
-  { sentence: "My friends ___ kind.",          answer: "are", subject: "My friends" },
-  { sentence: "My parents ___ from Hokkaido.", answer: "are", subject: "My parents" },
-  { sentence: "My shoes ___ new.",             answer: "are", subject: "My shoes" },
-  { sentence: "My cats ___ on the sofa.",      answer: "are", subject: "My cats" }
+  { sentence: "My bag ___ on the desk.",          answer: "is", subject: "My bag" },
+  { sentence: "My father ___ a doctor.",          answer: "is", subject: "My father" },
+  { sentence: "My favorite color ___ blue.",      answer: "is", subject: "My favorite color" },
+
+  /* Pattern 12: My + 複数名詞 → are （6問） */
+  { sentence: "My friends ___ kind.",             answer: "are", subject: "My friends" },
+  { sentence: "My parents ___ from Hokkaido.",    answer: "are", subject: "My parents" },
+  { sentence: "My shoes ___ new.",                answer: "are", subject: "My shoes" },
+  { sentence: "My cats ___ on the sofa.",         answer: "are", subject: "My cats" },
+  { sentence: "My books ___ in my bag.",          answer: "are", subject: "My books" },
+  { sentence: "My grandparents ___ very nice.",   answer: "are", subject: "My grandparents" }
 ];
 
 /* =========================================================
@@ -844,7 +897,7 @@ window.BE_VERB_QUESTIONS = [
    ========================================================= */
 (function () {
   'use strict';
-  const TOTAL_QUESTIONS = 10;
+  const TOTAL_QUESTIONS = 20;
   const VALID_ANSWERS = ['am', 'is', 'are'];
   const FEEDBACK_DELAY_CORRECT = 600;
   const FEEDBACK_DELAY_WRONG = 1200;
@@ -1068,7 +1121,7 @@ window.BE_VERB_QUESTIONS = [
       }
     };
     Object.keys(groups).forEach((k) => shuffle(groups[k]));
-    const quota = { am: 3, is: 4, are: 3 };
+    const quota = { am: 6, is: 7, are: 7 };
     const picked = [];
     Object.keys(quota).forEach((key) => {
       const want = quota[key];
@@ -1086,9 +1139,9 @@ window.BE_VERB_QUESTIONS = [
   }
 
   function decideRank(score) {
-    if (score >= 9) return { stars: '★★★', title: 'ネイティブ級' };
-    if (score >= 7) return { stars: '★★',   title: 'なかなかやる' };
-    return                  { stars: '★',     title: 'もう一回' };
+    if (score >= 18) return { stars: '★★★', title: 'ネイティブ級' };
+    if (score >= 14) return { stars: '★★',   title: 'なかなかやる' };
+    return                   { stars: '★',     title: 'もう一回' };
   }
 
   function formatTime(ms) {

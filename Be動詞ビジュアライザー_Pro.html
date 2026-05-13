@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Be動詞ビジュアライザー Pro — 3モード搭載版</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Hiragino Maru Gothic ProN', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e3eaf2 100%);
+      color: #2c3e50;
+      min-height: 100vh;
+      padding: 20px;
+      user-select: none;
+    }
+    .container { max-width: 1280px; margin: 0 auto; }
+
+    /* ヘッダ */
+    header { text-align: center; margin-bottom: 16px; }
+    h1 { font-size: 1.8rem; color: #2c3e50; margin-bottom: 4px; }
+    .subtitle { font-size: 0.95rem; color: #5a6c7d; }
+
+    /* モードタブ（最上部） */
+    .mode-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .mode-tab {
+      padding: 14px 26px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border: 3px solid #cbd5e0;
+      background: white;
+      color: #5a6c7d;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mode-tab:hover { border-color: #2c3e50; }
+    .mode-tab.active {
+      background: #2c3e50;
+      color: white;
+      border-color: #2c3e50;
+      box-shadow: 0 4px 12px rgba(44,62,80,0.25);
+    }
+    .mode-tab .icon { font-size: 1.3rem; }
+
+    /* 文型タブ */
+    .form-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .form-tab {
+      padding: 10px 22px;
+      font-size: 1rem;
+      font-weight: 700;
+      border: 2px solid #cbd5e0;
+      background: white;
+      color: #5a6c7d;
+      border-radius: 24px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .form-tab:hover { border-color: #3498db; color: #3498db; }
+    .form-tab.active {
+      background: #2c3e50; color: white; border-color: #2c3e50;
+    }
+
+    /* ビジュアル枠 */
+    .visual {
+      background: white;
+      border-radius: 14px;
+      padding: 28px 20px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+    }
+    .block {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      flex-shrink: 0;
+      will-change: transform;
+    }
+    .block .text { font-size: 2.2rem; font-weight: 700; line-height: 1; }
+    .block .label { font-size: 0.85rem; margin-top: 4px; opacity: 0.85; }
+
+    .subject {
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      background: #3498db; color: white;
+      box-shadow: 0 4px 10px rgba(52,152,219,0.35);
+    }
+    .verb {
+      min-width: 120px; padding: 24px 18px;
+      border-radius: 12px;
+      background: #e74c3c; color: white;
+      box-shadow: 0 4px 10px rgba(231,76,60,0.35);
+    }
+    .complement {
+      min-width: 160px; padding: 22px 28px;
+      background: #27ae60; color: white;
+      box-shadow: 0 4px 10px rgba(39,174,96,0.35);
+      clip-path: polygon(8% 0, 92% 0, 100% 50%, 92% 100%, 8% 100%, 0 50%);
+    }
+    .complement .text { font-size: 1.6rem; max-width: 240px; text-align: center; word-break: break-word; }
+
+    .not-badge {
+      background: #2c3e50; color: white;
+      padding: 9px 20px; border-radius: 22px;
+      font-size: 1.6rem; font-weight: 800;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(44,62,80,0.4);
+      will-change: transform;
+    }
+    .q-mark {
+      font-size: 3.5rem; font-weight: 800;
+      color: #e67e22;
+      flex-shrink: 0;
+      will-change: transform;
+    }
+    .period {
+      font-size: 3.5rem; font-weight: 800;
+      color: #2c3e50;
+      flex-shrink: 0;
+      will-change: transform;
+      line-height: 0.5;
+      align-self: flex-end;
+      padding-bottom: 8px;
+    }
+
+    .visible-fade {
+      transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s ease, padding 0.4s ease, margin 0.4s ease;
+    }
+    .hidden {
+      opacity: 0; transform: scale(0);
+      width: 0 !important; max-width: 0 !important; min-width: 0 !important;
+      padding-left: 0 !important; padding-right: 0 !important;
+      margin-left: -5px !important; margin-right: -5px !important;
+      overflow: hidden; pointer-events: none;
+    }
+
+    /* 出力 */
+    .output {
+      background: white; border-radius: 12px;
+      padding: 14px 22px; margin-bottom: 10px;
+      text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .output .label {
+      font-size: 0.8rem; color: #7f8c8d; margin-bottom: 4px;
+      letter-spacing: 0.1em;
+    }
+    .output.english .text { font-size: 1.8rem; font-weight: 700; color: #2c3e50; }
+    .output.japanese .text { font-size: 1.1rem; color: #5a6c7d; }
+
+    /* Yes/No応答 */
+    .response {
+      background: linear-gradient(135deg, #fff9e6 0%, #fdf5d4 100%);
+      border-left: 4px solid #f1c40f;
+    }
+    .response .label { color: #b7950b; }
+    .response .response-text {
+      display: flex; justify-content: center; gap: 24px;
+      align-items: center;
+      font-size: 1.4rem; font-weight: 700;
+      color: #2c3e50;
+      flex-wrap: wrap;
+    }
+    .response .yes { color: #27ae60; }
+    .response .no { color: #c0392b; }
+    .response .separator { color: #95a5a6; font-size: 1.6rem; }
+
+    /* === 比較モード === */
+    .compare-grid {
+      display: flex; flex-direction: column;
+      gap: 14px;
+    }
+    .compare-row {
+      background: white;
+      border-radius: 14px;
+      padding: 18px 22px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      display: grid;
+      grid-template-columns: 100px 1fr 240px;
+      align-items: center;
+      gap: 16px;
+      border-left: 6px solid;
+    }
+    .compare-row.affirm { border-left-color: #2c3e50; }
+    .compare-row.question { border-left-color: #e67e22; }
+    .compare-row.negative { border-left-color: #c0392b; }
+
+    .compare-label {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #2c3e50;
+      text-align: center;
+      padding: 8px 4px;
+      border-radius: 8px;
+      background: #f8f9fa;
+    }
+    .compare-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+    }
+    /* 比較モード内のブロックはコンパクト版 */
+    .compare-visual .subject {
+      width: 80px; height: 80px;
+    }
+    .compare-visual .subject .text { font-size: 1.2rem; }
+    .compare-visual .subject .label { font-size: 0.65rem; }
+    .compare-visual .verb {
+      min-width: 70px; padding: 14px 12px;
+    }
+    .compare-visual .verb .text { font-size: 1.2rem; }
+    .compare-visual .verb .label { font-size: 0.65rem; }
+    .compare-visual .complement {
+      min-width: 110px; padding: 14px 18px;
+    }
+    .compare-visual .complement .text { font-size: 1rem; max-width: 160px; }
+    .compare-visual .not-badge {
+      font-size: 1rem; padding: 5px 12px;
+    }
+    .compare-visual .q-mark { font-size: 2rem; }
+
+    .compare-output {
+      text-align: left;
+      padding-left: 12px;
+      border-left: 1px dashed #cbd5e0;
+    }
+    .compare-english {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 3px;
+    }
+    .compare-japanese {
+      font-size: 0.85rem;
+      color: #5a6c7d;
+    }
+
+    /* === 並べてみようモード === */
+    .arrange-task {
+      background: linear-gradient(135deg, #fef9e7 0%, #fcf3cf 100%);
+      border-left: 6px solid #f1c40f;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    .arrange-task .task-label {
+      font-size: 0.85rem; font-weight: 700;
+      color: #b7950b; margin-bottom: 4px;
+      letter-spacing: 0.1em;
+    }
+    .arrange-task .task-text {
+      font-size: 1.5rem; font-weight: 700; color: #2c3e50;
+    }
+
+    .arrange-area {
+      background: white;
+      border-radius: 14px;
+      padding: 28px 20px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      min-height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .arrange-block {
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s, opacity 0.3s;
+      will-change: transform;
+    }
+    .arrange-block:hover { transform: translateY(-4px) scale(1.05); }
+    .arrange-block.selected {
+      box-shadow: 0 0 0 4px #f1c40f, 0 6px 16px rgba(0,0,0,0.2) !important;
+      animation: pulse 1s ease infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: translateY(-4px) scale(1.05); }
+      50%      { transform: translateY(-6px) scale(1.08); }
+    }
+    .arrange-block.correct {
+      animation: correctFlash 0.6s ease;
+    }
+    .arrange-block.wrong {
+      animation: wrongShake 0.5s ease;
+    }
+    @keyframes correctFlash {
+      0%   { box-shadow: 0 0 0 0px rgba(39,174,96,0); }
+      50%  { box-shadow: 0 0 0 12px rgba(39,174,96,0.5); }
+      100% { box-shadow: 0 0 0 0px rgba(39,174,96,0); }
+    }
+    @keyframes wrongShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .arrange-buttons {
+      display: flex; justify-content: center;
+      gap: 10px; margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .arrange-btn {
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 700;
+      border: 2px solid;
+      background: white;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .arrange-btn.shuffle { border-color: #3498db; color: #3498db; }
+    .arrange-btn.shuffle:hover { background: #3498db; color: white; }
+    .arrange-btn.check { border-color: #27ae60; color: #27ae60; }
+    .arrange-btn.check:hover { background: #27ae60; color: white; }
+    .arrange-btn.next { border-color: #e67e22; color: #e67e22; }
+    .arrange-btn.next:hover { background: #e67e22; color: white; }
+
+    .arrange-result {
+      text-align: center;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 1.2rem; font-weight: 700;
+      margin-bottom: 14px;
+      transition: opacity 0.3s;
+    }
+    .arrange-result.success {
+      background: #d5f5e3; color: #27ae60;
+      border: 2px solid #27ae60;
+    }
+    .arrange-result.fail {
+      background: #fadbd8; color: #c0392b;
+      border: 2px solid #c0392b;
+    }
+    .arrange-result.hidden { opacity: 0; pointer-events: none; }
+
+    /* === 共通操作パネル === */
+    .controls {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .control-block { margin-bottom: 16px; }
+    .control-block:last-child { margin-bottom: 0; }
+    .control-block .heading {
+      font-size: 0.95rem; font-weight: 700;
+      color: #2c3e50; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .control-block .heading::before {
+      content: '';
+      display: inline-block;
+      width: 4px; height: 18px; border-radius: 2px;
+    }
+    .control-block.subject-block .heading::before { background: #3498db; }
+    .control-block.complement-block .heading::before { background: #27ae60; }
+
+    .subject-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+    .subject-btn {
+      padding: 8px 14px;
+      border: 2px solid #cbd5e0;
+      background: white; color: #5a6c7d;
+      border-radius: 8px;
+      font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .subject-btn:hover { border-color: #3498db; color: #3498db; }
+    .subject-btn.active { background: #3498db; color: white; border-color: #3498db; }
+    .subject-btn .ja-tag { font-size: 0.7rem; opacity: 0.8; margin-left: 3px; font-weight: 400; }
+    .subject-btn .verb-tag {
+      display: inline-block;
+      background: rgba(231,76,60,0.15); color: #c0392b;
+      font-size: 0.65rem; padding: 1px 5px;
+      border-radius: 8px; margin-left: 3px; font-weight: 700;
+    }
+    .subject-btn.active .verb-tag {
+      background: rgba(255,255,255,0.25); color: white;
+    }
+
+    .complement-input-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .bracket-symbol {
+      font-size: 1.4rem; color: #27ae60; font-weight: 700;
+    }
+    #complement-input {
+      flex: 1; padding: 9px 13px;
+      font-size: 1.05rem;
+      border: 2px solid #cbd5e0; border-radius: 8px;
+      outline: none; font-family: inherit;
+    }
+    #complement-input:focus { border-color: #27ae60; }
+
+    .preset-row { margin-top: 8px; }
+    .preset-category { margin-bottom: 9px; }
+    .preset-category:last-child { margin-bottom: 0; }
+    .preset-category-label {
+      font-size: 0.75rem; font-weight: 700;
+      margin-bottom: 4px;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .cat-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+    .preset-btn-row { display: flex; flex-wrap: wrap; gap: 4px; }
+    .preset-btn {
+      padding: 4px 10px;
+      background: #f8f9fa; border: 1px solid #cbd5e0;
+      color: #5a6c7d; border-radius: 14px;
+      font-size: 0.82rem; cursor: pointer;
+      transition: all 0.15s;
+      --cat-color: #27ae60;
+    }
+    .preset-btn:hover {
+      background: var(--cat-color); color: white;
+      border-color: var(--cat-color);
+      transform: translateY(-1px);
+    }
+
+    .examples {
+      margin-top: 14px; padding-top: 14px;
+      border-top: 1px dashed #cbd5e0;
+    }
+    .examples .heading {
+      font-size: 0.9rem; color: #5a6c7d;
+      margin-bottom: 8px; font-weight: 700;
+    }
+    .example-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+    .example-btn {
+      padding: 7px 12px;
+      background: #fff8dc; border: 1px solid #f1c40f;
+      color: #2c3e50; border-radius: 8px;
+      font-size: 0.85rem; cursor: pointer;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .example-btn:hover { background: #f1c40f; color: white; }
+
+    /* レスポンシブ */
+    @media (max-width: 800px) {
+      .compare-row { grid-template-columns: 80px 1fr; }
+      .compare-output { grid-column: span 2; padding-left: 0; border-left: none; border-top: 1px dashed #cbd5e0; padding-top: 8px; margin-top: 4px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <h1>Be動詞ビジュアライザー <span style="color:#e67e22">Pro</span></h1>
+    <div class="subtitle">主語＝<span style="color:#3498db">●</span>　動詞＝<span style="color:#e74c3c">■</span>　〜の部分＝<span style="color:#27ae60">&lt;◆&gt;</span></div>
+  </header>
+
+  <!-- モードタブ -->
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-mode="single">
+      <span class="icon">📺</span>シングル
+    </button>
+    <button class="mode-tab" data-mode="compare">
+      <span class="icon">🔀</span>比較（3文型同時）
+    </button>
+    <button class="mode-tab" data-mode="arrange">
+      <span class="icon">🎮</span>並べてみよう
+    </button>
+  </div>
+
+  <!-- ============ モード1：シングル ============ -->
+  <div class="mode-panel" id="panel-single">
+    <div class="form-tabs">
+      <button class="form-tab active" data-form="affirm">平叙文（〜です）</button>
+      <button class="form-tab" data-form="question">疑問文（〜ですか？）</button>
+      <button class="form-tab" data-form="negative">否定文（〜ではありません）</button>
+    </div>
+
+    <div class="visual" id="single-visual">
+      <div class="block subject visible-fade" id="block-subject">
+        <div class="text"></div><div class="label"></div>
+      </div>
+      <div class="block verb visible-fade" id="block-verb">
+        <div class="text"></div><div class="label">〜です</div>
+      </div>
+      <div class="not-badge visible-fade hidden" id="block-not">not</div>
+      <div class="block complement visible-fade" id="block-complement">
+        <div class="text"></div>
+      </div>
+      <span class="period visible-fade" id="block-period">.</span>
+      <span class="q-mark visible-fade hidden" id="block-qmark">?</span>
+    </div>
+
+    <div class="output english">
+      <div class="label">ENGLISH</div>
+      <div class="text" id="english-output"></div>
+    </div>
+    <div class="output japanese">
+      <div class="label">日本語</div>
+      <div class="text" id="japanese-output"></div>
+    </div>
+    <div class="output response" id="response-box" hidden>
+      <div class="label">★ こたえ方</div>
+      <div class="response-text" id="response-output"></div>
+    </div>
+  </div>
+
+  <!-- ============ モード2：比較 ============ -->
+  <div class="mode-panel" id="panel-compare" hidden>
+    <div class="compare-grid" id="compare-grid"></div>
+  </div>
+
+  <!-- ============ モード3：並べてみよう ============ -->
+  <div class="mode-panel" id="panel-arrange" hidden>
+    <div class="arrange-task">
+      <div class="task-label">お題</div>
+      <div class="task-text" id="arrange-task-text"></div>
+    </div>
+    <div class="arrange-area" id="arrange-area"></div>
+    <div class="arrange-result hidden" id="arrange-result"></div>
+    <div class="arrange-buttons">
+      <button class="arrange-btn shuffle" id="btn-shuffle">🔀 シャッフル</button>
+      <button class="arrange-btn check" id="btn-check">✓ 答え合わせ</button>
+      <button class="arrange-btn next" id="btn-next">▶ つぎのお題</button>
+    </div>
+  </div>
+
+  <!-- ============ 共通操作パネル（シングル・比較で使用） ============ -->
+  <div class="controls" id="controls-common">
+
+    <div class="control-block subject-block">
+      <div class="heading">① 主語をえらぶ（be動詞は自動で変わる）</div>
+      <div class="subject-btns" id="subject-btns"></div>
+    </div>
+
+    <div class="control-block complement-block">
+      <div class="heading">② 〜の部分を入れる（自由入力 OK）</div>
+      <div class="complement-input-row">
+        <span class="bracket-symbol">&lt;</span>
+        <input type="text" id="complement-input" value="cool" />
+        <span class="bracket-symbol">&gt;</span>
+      </div>
+      <div class="preset-row" id="preset-row"></div>
+    </div>
+
+    <div class="examples">
+      <div class="heading">★ ためしてみよう（クリックでセット）</div>
+      <div class="example-btns" id="example-btns"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  // ============ データ ============
+  const beVerb = {
+    'I':'am','You':'are','He':'is','She':'is','It':'is','We':'are','They':'are'
+  };
+  const subjectJa = {
+    'I':'私','You':'あなた','He':'彼','She':'彼女','It':'それ','We':'私たち','They':'彼ら'
+  };
+  // 応答用の主語（質問者→回答者の視点）
+  const responseSubject = {
+    'I':'you','You':'I','He':'he','She':'she','It':'it','We':'you','They':'they'
+  };
+  // 否定短縮形
+  const negShort = {
+    'am':"'m not",     // I'm not（特殊）
+    'are':"aren't",
+    'is':"isn't"
+  };
+
+  const presetCategories = [
+    { label:'形容詞（〜だ）', color:'#e67e22',
+      items:['cool','happy','hungry','tired','sleepy','busy','kind','nice','new','sad'] },
+    { label:'名詞（〜だ）', color:'#9b59b6',
+      items:['a teacher','a student','a singer','a doctor','a soccer player','a baseball player','a friend'] },
+    { label:'from（〜出身）', color:'#16a085',
+      items:['from Japan','from Tokyo','from America','from Canada','from Australia','from Iwate'] },
+    { label:'a fan of（〜が好き）', color:'#c0392b',
+      items:['a fan of soccer','a fan of baseball','a fan of anime','a fan of K-pop','a fan of Otani'] },
+    { label:'good at（〜が得意）', color:'#2980b9',
+      items:['good at sports','good at music','good at English','good at math','good at soccer','good at cooking','good at dancing'] }
+  ];
+
+  const examples = [
+    { subject:'I',    complement:'cool',             form:'affirm'   },
+    { subject:'You',  complement:'a teacher',        form:'affirm'   },
+    { subject:'He',   complement:'from Japan',       form:'affirm'   },
+    { subject:'She',  complement:'a fan of soccer',  form:'affirm'   },
+    { subject:'He',   complement:'good at soccer',   form:'affirm'   },
+    { subject:'She',  complement:'good at music',    form:'affirm'   },
+    { subject:'You',  complement:'a student',        form:'question' },
+    { subject:'He',   complement:'good at math',     form:'question' },
+    { subject:'I',    complement:'hungry',           form:'negative' },
+    { subject:'They', complement:'from China',       form:'negative' }
+  ];
+
+  // 並べモード用のお題プール
+  const arrangeTasks = [
+    { subject:'She',  complement:'a teacher',       form:'affirm',   ja:'彼女 は a teacher です。' },
+    { subject:'He',   complement:'from Canada',     form:'affirm',   ja:'彼 は from Canada です。' },
+    { subject:'You',  complement:'good at soccer',  form:'affirm',   ja:'あなた は good at soccer です。' },
+    { subject:'They', complement:'a fan of anime',  form:'affirm',   ja:'彼ら は a fan of anime です。' },
+    { subject:'You',  complement:'a student',       form:'question', ja:'あなた は a student ですか？' },
+    { subject:'He',   complement:'from Japan',      form:'question', ja:'彼 は from Japan ですか？' },
+    { subject:'She',  complement:'good at music',   form:'question', ja:'彼女 は good at music ですか？' },
+    { subject:'I',    complement:'hungry',          form:'negative', ja:'私 は hungry ではありません。' },
+    { subject:'She',  complement:'a doctor',        form:'negative', ja:'彼女 は a doctor ではありません。' },
+    { subject:'They', complement:'from China',      form:'negative', ja:'彼ら は from China ではありません。' }
+  ];
+
+  // ============ 状態 ============
+  let state = {
+    mode: 'single',
+    subject: 'I',
+    complement: 'cool',
+    form: 'affirm',
+    // 並べモード用
+    arrangeIdx: 0,
+    arrangeBlocks: [], // [{type, text, label, order}]
+    arrangeSelected: null
+  };
+
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function lowerSubject(s) { return s === 'I' ? 'I' : s.toLowerCase(); }
+
+  // ============ シングルモード ============
+  const blockSubject = document.getElementById('block-subject');
+  const blockVerb = document.getElementById('block-verb');
+  const blockNot = document.getElementById('block-not');
+  const blockComplement = document.getElementById('block-complement');
+  const blockPeriod = document.getElementById('block-period');
+  const blockQmark = document.getElementById('block-qmark');
+  const allBlocks = [blockSubject, blockVerb, blockNot, blockComplement, blockPeriod, blockQmark];
+
+  function renderSingle() {
+    const verb = beVerb[state.subject];
+    const subjJa = subjectJa[state.subject];
+    const c = state.complement || '___';
+
+    // FLIP First：表示状態と位置を記録
+    const beforeHidden = allBlocks.map(el => el.classList.contains('hidden'));
+    const firstPositions = allBlocks.map(el => el.getBoundingClientRect());
+
+    let subjectFirst, verbFirst, showNot=false, showQmark=false, showPeriod=true, order={};
+    if (state.form === 'affirm') {
+      subjectFirst=true; verbFirst=false;
+      order = { subject:1, verb:2, not:99, complement:3, period:4, qmark:99 };
+    } else if (state.form === 'question') {
+      subjectFirst=false; verbFirst=true; showQmark=true; showPeriod=false;
+      order = { verb:1, subject:2, complement:3, qmark:4, period:99, not:99 };
+    } else {
+      subjectFirst=true; verbFirst=false; showNot=true;
+      order = { subject:1, verb:2, not:3, complement:4, period:5, qmark:99 };
+    }
+
+    const subjectText = subjectFirst ? state.subject : lowerSubject(state.subject);
+    const verbText = verbFirst ? cap(verb) : verb;
+
+    blockSubject.querySelector('.text').textContent = subjectText;
+    blockSubject.querySelector('.label').textContent = `${subjJa} は`;
+    blockVerb.querySelector('.text').textContent = verbText;
+    blockComplement.querySelector('.text').textContent = c;
+
+    blockSubject.style.order = order.subject;
+    blockVerb.style.order = order.verb;
+    blockNot.style.order = order.not;
+    blockComplement.style.order = order.complement;
+    blockPeriod.style.order = order.period;
+    blockQmark.style.order = order.qmark;
+
+    blockNot.classList.toggle('hidden', !showNot);
+    blockQmark.classList.toggle('hidden', !showQmark);
+    blockPeriod.classList.toggle('hidden', !showPeriod);
+
+    // FLIP Last + Invert + Play
+    // ※ 表示↔非表示が切り替わる要素は除外（fade/scaleアニメーションに任せる）
+    requestAnimationFrame(() => {
+      allBlocks.forEach((el, i) => {
+        const wasHidden = beforeHidden[i];
+        const isHidden = el.classList.contains('hidden');
+        // 表示状態が変わった要素はFLIP移動を適用しない
+        if (wasHidden !== isHidden) return;
+        // 元から hidden だった要素もスキップ
+        if (wasHidden) return;
+
+        const first = firstPositions[i];
+        const last = el.getBoundingClientRect();
+        const dx = first.left - last.left;
+        const dy = first.top - last.top;
+        if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return;
+        el.style.transition = 'none';
+        el.style.transform = `translate(${dx}px, ${dy}px)`;
+        requestAnimationFrame(() => {
+          el.style.transition = '';
+          el.style.transform = '';
+        });
+      });
+    });
+
+    // 英文・日本語
+    let english, japanese;
+    if (state.form === 'affirm') {
+      english = `${state.subject} ${verb} ${c}.`;
+      japanese = `${subjJa} は ${c} です。`;
+    } else if (state.form === 'question') {
+      english = `${cap(verb)} ${lowerSubject(state.subject)} ${c}?`;
+      japanese = `${subjJa} は ${c} ですか？`;
+    } else {
+      english = `${state.subject} ${verb} not ${c}.`;
+      japanese = `${subjJa} は ${c} ではありません。`;
+    }
+    document.getElementById('english-output').textContent = english;
+    document.getElementById('japanese-output').textContent = japanese;
+
+    // Yes/No応答（疑問文時のみ）
+    const responseBox = document.getElementById('response-box');
+    if (state.form === 'question') {
+      const rSubj = responseSubject[state.subject]; // 小文字 or 'I'
+      // 応答主語に対応するbe動詞
+      const subjectKeyForVerb =
+        rSubj === 'I' ? 'I' :
+        rSubj === 'you' ? 'You' :
+        rSubj === 'he' ? 'He' :
+        rSubj === 'she' ? 'She' :
+        rSubj === 'it' ? 'It' :
+        rSubj === 'they' ? 'They' : 'They';
+      const rVerb = beVerb[subjectKeyForVerb];
+      // 短縮形（否定）
+      let negShortStr;
+      if (rVerb === 'am') {
+        // I'm not（I以外で am になることはないが念のため）
+        negShortStr = `${rSubj}'m not`;
+      } else {
+        negShortStr = `${rSubj} ${negShort[rVerb]}`;
+      }
+      document.getElementById('response-output').innerHTML = `
+        <span class="yes">Yes, ${rSubj} ${rVerb}.</span>
+        <span class="separator">／</span>
+        <span class="no">No, ${negShortStr}.</span>
+      `;
+      responseBox.hidden = false;
+    } else {
+      responseBox.hidden = true;
+    }
+  }
+
+  // ============ 比較モード ============
+  function renderCompare() {
+    const verb = beVerb[state.subject];
+    const subjJa = subjectJa[state.subject];
+    const c = state.complement || '___';
+    const grid = document.getElementById('compare-grid');
+    grid.innerHTML = '';
+
+    const forms = [
+      { key:'affirm',   label:'平叙文',  arrow:'〜です' },
+      { key:'question', label:'疑問文',  arrow:'〜ですか？' },
+      { key:'negative', label:'否定文',  arrow:'〜ではありません' }
+    ];
+
+    forms.forEach(f => {
+      const row = document.createElement('div');
+      row.className = `compare-row ${f.key}`;
+
+      // ラベル
+      const labelDiv = document.createElement('div');
+      labelDiv.className = 'compare-label';
+      labelDiv.innerHTML = `${f.label}<br><small style="font-size:0.7rem;color:#7f8c8d;font-weight:600">${f.arrow}</small>`;
+      row.appendChild(labelDiv);
+
+      // ビジュアル
+      const visual = document.createElement('div');
+      visual.className = 'compare-visual';
+
+      let blocks = [];
+      let english, japanese;
+
+      if (f.key === 'affirm') {
+        blocks = [
+          { type:'subject', text:state.subject, label:`${subjJa} は` },
+          { type:'verb', text:verb, label:'〜です' },
+          { type:'complement', text:c },
+          { type:'period' }
+        ];
+        english = `${state.subject} ${verb} ${c}.`;
+        japanese = `${subjJa} は ${c} です。`;
+      } else if (f.key === 'question') {
+        blocks = [
+          { type:'verb', text:cap(verb), label:'〜です' },
+          { type:'subject', text:lowerSubject(state.subject), label:`${subjJa} は` },
+          { type:'complement', text:c },
+          { type:'qmark' }
+        ];
+        english = `${cap(verb)} ${lowerSubject(state.subject)} ${c}?`;
+        japanese = `${subjJa} は ${c} ですか？`;
+      } else {
+        blocks = [
+          { type:'subject', text:state.subject, label:`${subjJa} は` },
+          { type:'verb', text:verb, label:'〜です' },
+          { type:'not' },
+          { type:'complement', text:c },
+          { type:'period' }
+        ];
+        english = `${state.subject} ${verb} not ${c}.`;
+        japanese = `${subjJa} は ${c} ではありません。`;
+      }
+
+      blocks.forEach(b => visual.appendChild(makeBlock(b)));
+      row.appendChild(visual);
+
+      // 出力
+      const out = document.createElement('div');
+      out.className = 'compare-output';
+      out.innerHTML = `
+        <div class="compare-english">${english}</div>
+        <div class="compare-japanese">${japanese}</div>
+      `;
+      row.appendChild(out);
+
+      grid.appendChild(row);
+    });
+  }
+
+  function makeBlock(b) {
+    let el;
+    if (b.type === 'subject') {
+      el = document.createElement('div');
+      el.className = 'block subject';
+      el.innerHTML = `<div class="text">${b.text}</div><div class="label">${b.label}</div>`;
+    } else if (b.type === 'verb') {
+      el = document.createElement('div');
+      el.className = 'block verb';
+      el.innerHTML = `<div class="text">${b.text}</div><div class="label">${b.label}</div>`;
+    } else if (b.type === 'complement') {
+      el = document.createElement('div');
+      el.className = 'block complement';
+      el.innerHTML = `<div class="text">${b.text}</div>`;
+    } else if (b.type === 'not') {
+      el = document.createElement('div');
+      el.className = 'not-badge';
+      el.textContent = 'not';
+    } else if (b.type === 'qmark') {
+      el = document.createElement('span');
+      el.className = 'q-mark';
+      el.textContent = '?';
+    } else if (b.type === 'period') {
+      el = document.createElement('span');
+      el.className = 'period';
+      el.textContent = '.';
+    }
+    return el;
+  }
+
+  // ============ 並べてみようモード ============
+  function buildArrangeBlocks(task) {
+    const verb = beVerb[task.subject];
+    const subjJa = subjectJa[task.subject];
+    const c = task.complement;
+    let blocks;
+    if (task.form === 'affirm') {
+      blocks = [
+        { type:'subject', text:task.subject, label:`${subjJa} は` },
+        { type:'verb', text:verb, label:'〜です' },
+        { type:'complement', text:c },
+        { type:'period' }
+      ];
+    } else if (task.form === 'question') {
+      blocks = [
+        { type:'verb', text:cap(verb), label:'〜です' },
+        { type:'subject', text:lowerSubject(task.subject), label:`${subjJa} は` },
+        { type:'complement', text:c },
+        { type:'qmark' }
+      ];
+    } else {
+      blocks = [
+        { type:'subject', text:task.subject, label:`${subjJa} は` },
+        { type:'verb', text:verb, label:'〜です' },
+        { type:'not' },
+        { type:'complement', text:c },
+        { type:'period' }
+      ];
+    }
+    // 正解の順序を memo
+    blocks.forEach((b, i) => b.correctOrder = i + 1);
+    return blocks;
+  }
+
+  function shuffleArrange() {
+    const task = arrangeTasks[state.arrangeIdx];
+    const blocks = buildArrangeBlocks(task);
+    // 現在の order をランダムにする（ただし完全な正解と一致しないよう）
+    let orders;
+    let attempts = 0;
+    do {
+      orders = [...Array(blocks.length).keys()].map(i => i + 1).sort(() => Math.random() - 0.5);
+      attempts++;
+    } while (orders.every((o, i) => o === i + 1) && attempts < 10);
+    blocks.forEach((b, i) => b.order = orders[i]);
+    state.arrangeBlocks = blocks;
+    state.arrangeSelected = null;
+    renderArrange();
+    hideArrangeResult();
+  }
+
+  function renderArrange() {
+    const task = arrangeTasks[state.arrangeIdx];
+    document.getElementById('arrange-task-text').textContent = task.ja;
+
+    const area = document.getElementById('arrange-area');
+    area.innerHTML = '';
+
+    state.arrangeBlocks.forEach((b, i) => {
+      const el = makeBlock(b);
+      el.classList.add('arrange-block', 'visible-fade');
+      el.style.order = b.order;
+      el.dataset.idx = i;
+      if (state.arrangeSelected === i) el.classList.add('selected');
+      el.addEventListener('click', () => onArrangeClick(i));
+      area.appendChild(el);
+    });
+  }
+
+  function onArrangeClick(idx) {
+    if (state.arrangeSelected === null) {
+      state.arrangeSelected = idx;
+    } else if (state.arrangeSelected === idx) {
+      state.arrangeSelected = null;
+    } else {
+      // 入れ替え（FLIPアニメーション）
+      const blocks = state.arrangeBlocks;
+      const a = blocks[state.arrangeSelected];
+      const b = blocks[idx];
+
+      const areaBlocks = Array.from(document.querySelectorAll('.arrange-block'));
+      const firstPositions = areaBlocks.map(el => el.getBoundingClientRect());
+
+      [a.order, b.order] = [b.order, a.order];
+      state.arrangeSelected = null;
+
+      // DOMを更新
+      areaBlocks.forEach((el, i) => {
+        const dataIdx = parseInt(el.dataset.idx);
+        el.style.order = blocks[dataIdx].order;
+        el.classList.toggle('selected', state.arrangeSelected === dataIdx);
+      });
+
+      // FLIP
+      requestAnimationFrame(() => {
+        areaBlocks.forEach((el, i) => {
+          const first = firstPositions[i];
+          const last = el.getBoundingClientRect();
+          const dx = first.left - last.left;
+          const dy = first.top - last.top;
+          if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return;
+          el.style.transition = 'none';
+          el.style.transform = `translate(${dx}px, ${dy}px)`;
+          requestAnimationFrame(() => {
+            el.style.transition = '';
+            el.style.transform = '';
+          });
+        });
+      });
+      return;
+    }
+    renderArrange();
+  }
+
+  function checkArrange() {
+    const correct = state.arrangeBlocks.every(b => b.order === b.correctOrder);
+    const resultBox = document.getElementById('arrange-result');
+    const areaBlocks = Array.from(document.querySelectorAll('.arrange-block'));
+    if (correct) {
+      resultBox.className = 'arrange-result success';
+      resultBox.textContent = '🎉 せいかい！ よくできました';
+      areaBlocks.forEach((el, i) => {
+        setTimeout(() => el.classList.add('correct'), i * 80);
+      });
+    } else {
+      resultBox.className = 'arrange-result fail';
+      resultBox.textContent = '❌ もう一度ためしてみよう';
+      areaBlocks.forEach(el => el.classList.add('wrong'));
+      setTimeout(() => areaBlocks.forEach(el => el.classList.remove('wrong')), 600);
+    }
+  }
+  function hideArrangeResult() {
+    const resultBox = document.getElementById('arrange-result');
+    resultBox.className = 'arrange-result hidden';
+  }
+  function nextArrange() {
+    state.arrangeIdx = (state.arrangeIdx + 1) % arrangeTasks.length;
+    shuffleArrange();
+  }
+
+  // ============ レンダラ振り分け ============
+  function render() {
+    if (state.mode === 'single') renderSingle();
+    else if (state.mode === 'compare') renderCompare();
+    else if (state.mode === 'arrange') renderArrange();
+    // 操作パネル状態同期
+    document.querySelectorAll('.form-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.form === state.form);
+    });
+    document.querySelectorAll('.subject-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.subject === state.subject);
+    });
+    const input = document.getElementById('complement-input');
+    if (input.value !== state.complement) input.value = state.complement;
+  }
+
+  function setMode(mode) {
+    state.mode = mode;
+    document.querySelectorAll('.mode-panel').forEach(p => {
+      p.hidden = p.id !== `panel-${mode}`;
+    });
+    document.querySelectorAll('.mode-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.mode === mode);
+    });
+    document.getElementById('controls-common').hidden = mode === 'arrange';
+
+    if (mode === 'arrange' && state.arrangeBlocks.length === 0) {
+      shuffleArrange();
+    } else {
+      render();
+    }
+  }
+
+  // ============ 操作パネル組み立て ============
+  // 主語ボタン
+  const subjectBtnsContainer = document.getElementById('subject-btns');
+  Object.keys(beVerb).forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'subject-btn';
+    btn.dataset.subject = s;
+    btn.innerHTML = `${s}<span class="ja-tag">(${subjectJa[s]})</span><span class="verb-tag">${beVerb[s]}</span>`;
+    btn.addEventListener('click', () => { state.subject = s; render(); });
+    subjectBtnsContainer.appendChild(btn);
+  });
+
+  // 文型タブ（シングルモード用）
+  document.querySelectorAll('.form-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      state.form = tab.dataset.form;
+      render();
+    });
+  });
+
+  // モードタブ
+  document.querySelectorAll('.mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => setMode(tab.dataset.mode));
+  });
+
+  // 補語入力
+  document.getElementById('complement-input').addEventListener('input', e => {
+    state.complement = e.target.value;
+    render();
+  });
+
+  // 補語プリセット
+  const presetRow = document.getElementById('preset-row');
+  presetCategories.forEach(cat => {
+    const catWrap = document.createElement('div');
+    catWrap.className = 'preset-category';
+    const catLabel = document.createElement('div');
+    catLabel.className = 'preset-category-label';
+    catLabel.style.color = cat.color;
+    catLabel.innerHTML = `<span class="cat-dot" style="background:${cat.color}"></span>${cat.label}`;
+    catWrap.appendChild(catLabel);
+    const btnRow = document.createElement('div');
+    btnRow.className = 'preset-btn-row';
+    cat.items.forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = 'preset-btn';
+      btn.textContent = p;
+      btn.style.setProperty('--cat-color', cat.color);
+      btn.addEventListener('click', () => {
+        state.complement = p;
+        document.getElementById('complement-input').value = p;
+        render();
+      });
+      btnRow.appendChild(btn);
+    });
+    catWrap.appendChild(btnRow);
+    presetRow.appendChild(catWrap);
+  });
+
+  // 例文ボタン
+  const exampleBtnsContainer = document.getElementById('example-btns');
+  examples.forEach(ex => {
+    const verb = beVerb[ex.subject];
+    let label;
+    if (ex.form === 'affirm') label = `${ex.subject} ${verb} ${ex.complement}.`;
+    else if (ex.form === 'question') label = `${cap(verb)} ${lowerSubject(ex.subject)} ${ex.complement}?`;
+    else label = `${ex.subject} ${verb} not ${ex.complement}.`;
+    const btn = document.createElement('button');
+    btn.className = 'example-btn';
+    btn.textContent = label;
+    btn.addEventListener('click', () => {
+      state.subject = ex.subject;
+      state.complement = ex.complement;
+      state.form = ex.form;
+      render();
+    });
+    exampleBtnsContainer.appendChild(btn);
+  });
+
+  // 並べモードのボタン
+  document.getElementById('btn-shuffle').addEventListener('click', shuffleArrange);
+  document.getElementById('btn-check').addEventListener('click', checkArrange);
+  document.getElementById('btn-next').addEventListener('click', nextArrange);
+
+  // 初期描画
+  render();
+</script>
+
+</body>
+</html>

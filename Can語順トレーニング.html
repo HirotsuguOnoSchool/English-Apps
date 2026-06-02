@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="format-detection" content="telephone=no">
+  <title>Can 語順トレーニング — 中1英語</title>
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+    }
+    html, body {
+      height: 100%; overflow: hidden;
+      -webkit-text-size-adjust: 100%;
+      touch-action: manipulation;
+    }
+    body {
+      font-family: 'Hiragino Maru Gothic ProN', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e3eaf2 100%);
+      color: #2c3e50;
+      padding: 12px 18px;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+    }
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    /* ヘッダ */
+    header {
+      text-align: center;
+      flex-shrink: 0;
+      margin-bottom: 10px;
+    }
+    h1 {
+      font-size: 1.4rem; color: #2c3e50;
+      display: inline-block;
+    }
+    h1 .accent {
+      color: #1a7a1a;
+      background: #d5f5e3;
+      padding: 1px 10px;
+      border-radius: 6px;
+      margin: 0 4px;
+    }
+    .subtitle {
+      font-size: 0.85rem; color: #5a6c7d;
+      margin-top: 2px;
+    }
+
+    /* 進捗バー */
+    .progress-bar-wrap {
+      flex-shrink: 0;
+      background: white;
+      border-radius: 10px;
+      padding: 10px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .progress-bar {
+      flex: 1;
+      height: 14px;
+      background: #ecf0f1;
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #1a7a1a 0%, #27ae60 100%);
+      transition: width 0.4s ease;
+    }
+    .progress-text {
+      font-size: 0.95rem; font-weight: 700;
+      color: #2c3e50;
+      white-space: nowrap;
+    }
+    .progress-text .current {
+      color: #1a7a1a; font-size: 1.2rem;
+    }
+    .progress-score {
+      font-size: 0.85rem;
+      color: #5a6c7d;
+      white-space: nowrap;
+    }
+    .progress-score .correct { color: #27ae60; font-weight: 700; }
+
+    /* メインカード */
+    .main-card {
+      flex: 1;
+      background: white;
+      border-radius: 16px;
+      padding: 20px 24px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    /* 問題タイプバッジ */
+    .type-badge {
+      display: inline-block;
+      font-size: 0.8rem;
+      padding: 3px 12px;
+      border-radius: 14px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      align-self: flex-start;
+    }
+    .type-badge.affirm   { background: #d5f5e3; color: #1a7a1a; }
+    .type-badge.negative { background: #fadbd8; color: #c0392b; }
+    .type-badge.question { background: #fdebd0; color: #d68910; }
+    .type-badge.response { background: #d6eaf8; color: #1f618d; }
+
+    /* 日本語文 */
+    .ja-sentence {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #2c3e50;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #fff9e6 0%, #fdf5d4 100%);
+      border-left: 5px solid #f1c40f;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    /* 解答エリア */
+    .answer-area {
+      background: rgba(0,0,0,0.025);
+      border: 3px dashed #cbd5e0;
+      border-radius: 12px;
+      padding: 16px;
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+    .answer-area.correct {
+      background: linear-gradient(135deg, #d5f5e3 0%, #a9dfbf 100%);
+      border-color: #27ae60;
+      border-style: solid;
+    }
+    .answer-area.wrong {
+      background: linear-gradient(135deg, #fadbd8 0%, #f5b7b1 100%);
+      border-color: #c0392b;
+      border-style: solid;
+      animation: shake 0.4s ease;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+    .answer-area.empty::before {
+      content: '↓ 下の単語をクリックして並べよう';
+      color: #95a5a6;
+      font-size: 1rem;
+      width: 100%;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    /* 単語チップ */
+    .chips-area {
+      background: white;
+      border: 2px solid #ecf0f1;
+      border-radius: 12px;
+      padding: 16px;
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .chip {
+      display: inline-block;
+      padding: 10px 18px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: white;
+      border: 2px solid #3498db;
+      color: #2c5282;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: 0.02em;
+      box-shadow: 0 2px 6px rgba(52,152,219,0.15);
+    }
+    .chip:hover {
+      background: #3498db;
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 14px rgba(52,152,219,0.35);
+    }
+    .chip.placed {
+      background: #2c5282;
+      color: white;
+      border-color: #2c5282;
+    }
+    .chip.placed:hover {
+      background: #c0392b;
+      border-color: #c0392b;
+    }
+    .chip.locked {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* メッセージ */
+    .message {
+      flex-shrink: 0;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: 800;
+      padding: 8px;
+      min-height: 38px;
+    }
+    .message.correct { color: #27ae60; }
+    .message.wrong { color: #c0392b; }
+
+    /* ボタン */
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+    .btn {
+      padding: 12px 28px;
+      font-size: 1.05rem; font-weight: 800;
+      border: 3px solid;
+      background: white;
+      border-radius: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.05em;
+      font-family: inherit;
+    }
+    .btn:disabled {
+      opacity: 0.35; cursor: not-allowed;
+    }
+    .btn-check { border-color: #27ae60; color: #27ae60; }
+    .btn-check:not(:disabled):hover {
+      background: #27ae60; color: white;
+      transform: translateY(-2px);
+    }
+    .btn-reset { border-color: #95a5a6; color: #7f8c8d; }
+    .btn-reset:not(:disabled):hover {
+      background: #95a5a6; color: white;
+    }
+    .btn-next { border-color: #e67e22; color: #e67e22; }
+    .btn-next:not(:disabled):hover {
+      background: #e67e22; color: white;
+      transform: translateY(-2px);
+    }
+    .btn-prev { border-color: #95a5a6; color: #7f8c8d; }
+    .btn-prev:not(:disabled):hover {
+      background: #95a5a6; color: white;
+    }
+
+    /* 完了画面 */
+    .summary-screen {
+      display: none;
+      flex: 1;
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      text-align: center;
+    }
+    .summary-screen.active { display: flex; }
+    .summary-title {
+      font-size: 2.2rem; font-weight: 800;
+      color: #1a7a1a;
+    }
+    .summary-emoji { font-size: 4rem; }
+    .summary-stats {
+      display: flex; gap: 32px;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .summary-stat {
+      background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
+      padding: 16px 24px;
+      border-radius: 12px;
+      min-width: 140px;
+    }
+    .summary-stat .label {
+      font-size: 0.85rem; color: #5a6c7d;
+      letter-spacing: 0.1em;
+    }
+    .summary-stat .value {
+      font-size: 2.2rem; font-weight: 800;
+      color: #2c3e50;
+      margin-top: 4px;
+    }
+    .summary-stat .value.green { color: #27ae60; }
+    .summary-stat .value.orange { color: #e67e22; }
+    .summary-buttons {
+      display: flex; gap: 12px;
+      flex-wrap: wrap; justify-content: center;
+    }
+
+    /* レスポンシブ */
+    @media (max-width: 800px), (orientation: portrait) {
+      html, body { height: auto; overflow: auto; }
+      h1 { font-size: 1.2rem; }
+      .chip { font-size: 1.1rem; padding: 8px 14px; }
+      .ja-sentence { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <h1><span class="accent">Can</span>語順トレーニング</h1>
+    <div class="subtitle">単語をクリックして、正しい順に並べよう</div>
+  </header>
+
+  <!-- 進捗バー -->
+  <div class="progress-bar-wrap" id="progress-wrap">
+    <div class="progress-text">
+      問題 <span class="current" id="prog-current">1</span> / <span id="prog-total">30</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="prog-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-score">
+      正解 <span class="correct" id="score-correct">0</span> / <span id="score-total">0</span>
+    </div>
+  </div>
+
+  <!-- メイン問題画面 -->
+  <div class="main-card" id="main-card">
+    <span class="type-badge" id="type-badge">肯定文</span>
+    <div class="ja-sentence" id="ja-sentence"></div>
+    <div class="answer-area empty" id="answer-area"></div>
+    <div class="chips-area" id="chips-area"></div>
+    <div class="message" id="message"></div>
+    <div class="buttons">
+      <button class="btn btn-prev" id="btn-prev">◀ 戻る</button>
+      <button class="btn btn-reset" id="btn-reset">🔄 リセット</button>
+      <button class="btn btn-check" id="btn-check">✓ 答え合わせ</button>
+      <button class="btn btn-next" id="btn-next" disabled>次へ ▶</button>
+    </div>
+  </div>
+
+  <!-- 完了画面 -->
+  <div class="summary-screen" id="summary-screen">
+    <div class="summary-emoji" id="summary-emoji">🎉</div>
+    <div class="summary-title" id="summary-title">お疲れさま！</div>
+    <div class="summary-stats">
+      <div class="summary-stat">
+        <div class="label">正解</div>
+        <div class="value green" id="sum-correct">0</div>
+      </div>
+      <div class="summary-stat">
+        <div class="label">合計問題</div>
+        <div class="value" id="sum-total">30</div>
+      </div>
+      <div class="summary-stat">
+        <div class="label">正答率</div>
+        <div class="value orange" id="sum-rate">0%</div>
+      </div>
+    </div>
+    <div class="summary-buttons">
+      <button class="btn btn-next" onclick="restart()">🔄 最初からもう一度</button>
+      <button class="btn btn-check" id="btn-review" onclick="reviewWrong()">📝 間違えた問題だけ</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ============ 問題プール（30問）============
+  const PROBLEMS = [
+    // 肯定文 10
+    { type:'affirm',   ja:'私はサッカーをすることができます。',           answer:['I','can','play','soccer','.'] },
+    { type:'affirm',   ja:'彼女はピアノを弾くことができます。',           answer:['She','can','play','the','piano','.'] },
+    { type:'affirm',   ja:'彼は速く泳ぐことができます。',                 answer:['He','can','swim','fast','.'] },
+    { type:'affirm',   ja:'トムは牛乳を飲むことができます。',             answer:['Tom','can','drink','milk','.'] },
+    { type:'affirm',   ja:'リサはお菓子を作ることができます。',           answer:['Lisa','can','make','sweets','.'] },
+    { type:'affirm',   ja:'父は料理がじょうずです。',                     answer:['My','father','can','cook','well','.'] },
+    { type:'affirm',   ja:'私たちは英語を話すことができます。',           answer:['We','can','speak','English','.'] },
+    { type:'affirm',   ja:'彼らは速く走ることができます。',               answer:['They','can','run','fast','.'] },
+    { type:'affirm',   ja:'私の姉は歌がじょうずです。',                   answer:['My','sister','can','sing','well','.'] },
+    { type:'affirm',   ja:'私は漢字を読むことができます。',               answer:['I','can','read','kanji','.'] },
+
+    // 否定文 7
+    { type:'negative', ja:'私はラグビーをすることができません。',         answer:['I','cannot','play','rugby','.'] },
+    { type:'negative', ja:'彼はネコを飼うことができません。',             answer:['He','cannot','have','a','cat','.'] },
+    { type:'negative', ja:'彼女はシュウマイを作ることができません。',     answer:["She","can't",'make','shumai','.'] },
+    { type:'negative', ja:'私は中国語を話すことができません。',           answer:["I","can't",'speak','Chinese','.'] },
+    { type:'negative', ja:'私たちは速く泳ぐことができません。',           answer:['We','cannot','swim','fast','.'] },
+    { type:'negative', ja:'彼らは英語を読むことができません。',           answer:["They","can't",'read','English','.'] },
+    { type:'negative', ja:'マイクは自転車に乗ることができません。',       answer:['Mike','cannot','ride','a','bike','.'] },
+
+    // 疑問文 7
+    { type:'question', ja:'あなたはピアノを弾くことができますか。',       answer:['Can','you','play','the','piano','?'] },
+    { type:'question', ja:'あなたはひらがなを読むことができますか。',     answer:['Can','you','read','hiragana','?'] },
+    { type:'question', ja:'彼女は速く泳ぐことができますか。',             answer:['Can','she','swim','fast','?'] },
+    { type:'question', ja:'彼は料理がじょうずですか。',                   answer:['Can','he','cook','well','?'] },
+    { type:'question', ja:'彼らは日本語を話すことができますか。',         answer:['Can','they','speak','Japanese','?'] },
+    { type:'question', ja:'お父さんは運転することができますか。',         answer:['Can','your','father','drive','?'] },
+    { type:'question', ja:'あなたはそのレッスンを受けることができますか。', answer:['Can','you','take','the','lesson','?'] },
+
+    // 応答 6
+    { type:'response', ja:'はい、できます。（私）',                       answer:['Yes',',','I','can','.'] },
+    { type:'response', ja:'いいえ、できません。（私）',                   answer:['No',',','I','cannot','.'] },
+    { type:'response', ja:'はい、彼女はできます。',                       answer:['Yes',',','she','can','.'] },
+    { type:'response', ja:'いいえ、彼はできません。',                     answer:['No',',','he',"can't",'.'] },
+    { type:'response', ja:'はい、彼らはできます。',                       answer:['Yes',',','they','can','.'] },
+    { type:'response', ja:'いいえ、できません。（短縮形・私）',           answer:['No',',','I',"can't",'.'] }
+  ];
+
+  const TYPE_LABEL = {
+    affirm:'肯定文', negative:'否定文', question:'疑問文', response:'応答'
+  };
+
+  // ============ 状態 ============
+  let state = {
+    order: [],          // 出題順（インデックス配列）
+    idx: 0,
+    placed: [],         // 解答欄の語（順序）
+    available: [],      // チップエリアの語（シャッフル済）
+    isChecked: false,
+    isCorrect: false,
+    results: {}         // {problemIdx: 'correct'|'wrong'}
+  };
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function initOrder(problemIndices) {
+    state.order = problemIndices ? [...problemIndices] : PROBLEMS.map((_, i) => i);
+    state.idx = 0;
+    state.results = {};
+    loadProblem();
+    document.getElementById('summary-screen').classList.remove('active');
+    document.getElementById('main-card').style.display = '';
+    document.getElementById('progress-wrap').style.display = '';
+  }
+
+  function loadProblem() {
+    const problem = PROBLEMS[state.order[state.idx]];
+    state.placed = [];
+    // 答えの語をシャッフルして available に。完全に正解順と一致しないようにする
+    let words;
+    let attempts = 0;
+    do {
+      words = shuffle(problem.answer);
+      attempts++;
+    } while (
+      words.every((w, i) => w === problem.answer[i]) &&
+      attempts < 10
+    );
+    state.available = words.map((w, i) => ({ word: w, origIdx: i }));
+    state.isChecked = false;
+    state.isCorrect = false;
+    render();
+  }
+
+  function render() {
+    const problem = PROBLEMS[state.order[state.idx]];
+
+    // バッジ・問題文
+    const badge = document.getElementById('type-badge');
+    badge.className = `type-badge ${problem.type}`;
+    badge.textContent = TYPE_LABEL[problem.type];
+    document.getElementById('ja-sentence').textContent = problem.ja;
+
+    // 進捗
+    document.getElementById('prog-current').textContent = state.idx + 1;
+    document.getElementById('prog-total').textContent = state.order.length;
+    document.getElementById('prog-fill').style.width =
+      `${(state.idx / state.order.length) * 100}%`;
+    const correctCount = Object.values(state.results).filter(r => r === 'correct').length;
+    const totalAnswered = Object.keys(state.results).length;
+    document.getElementById('score-correct').textContent = correctCount;
+    document.getElementById('score-total').textContent = totalAnswered;
+
+    // 解答エリア
+    const answerArea = document.getElementById('answer-area');
+    answerArea.className = 'answer-area';
+    if (state.placed.length === 0) answerArea.classList.add('empty');
+    if (state.isChecked) {
+      answerArea.classList.add(state.isCorrect ? 'correct' : 'wrong');
+    }
+    answerArea.innerHTML = '';
+    state.placed.forEach((item, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'chip placed';
+      if (state.isChecked && state.isCorrect) chip.classList.add('locked');
+      chip.textContent = item.word;
+      chip.addEventListener('click', () => returnChip(i));
+      answerArea.appendChild(chip);
+    });
+
+    // チップエリア
+    const chipsArea = document.getElementById('chips-area');
+    chipsArea.innerHTML = '';
+    state.available.forEach((item) => {
+      const chip = document.createElement('div');
+      chip.className = 'chip';
+      if (state.isChecked && state.isCorrect) chip.classList.add('locked');
+      chip.textContent = item.word;
+      chip.addEventListener('click', () => placeChip(item.origIdx));
+      chipsArea.appendChild(chip);
+    });
+
+    // メッセージ
+    const msg = document.getElementById('message');
+    if (state.isChecked && state.isCorrect) {
+      msg.className = 'message correct';
+      msg.textContent = '🎉 正解！';
+    } else if (state.isChecked && !state.isCorrect) {
+      msg.className = 'message wrong';
+      msg.textContent = '❌ もう一度試してみよう';
+    } else {
+      msg.className = 'message';
+      msg.textContent = '';
+    }
+
+    // ボタン
+    document.getElementById('btn-prev').disabled = state.idx === 0;
+    document.getElementById('btn-check').disabled =
+      state.placed.length !== problem.answer.length || (state.isChecked && state.isCorrect);
+    document.getElementById('btn-reset').disabled = state.placed.length === 0;
+    document.getElementById('btn-next').disabled = !state.isCorrect;
+  }
+
+  function placeChip(origIdx) {
+    if (state.isChecked && state.isCorrect) return;
+    const i = state.available.findIndex(a => a.origIdx === origIdx);
+    if (i === -1) return;
+    state.placed.push(state.available[i]);
+    state.available.splice(i, 1);
+    state.isChecked = false;
+    state.isCorrect = false;
+    render();
+  }
+
+  function returnChip(placedIdx) {
+    if (state.isChecked && state.isCorrect) return;
+    state.available.push(state.placed[placedIdx]);
+    state.placed.splice(placedIdx, 1);
+    state.isChecked = false;
+    state.isCorrect = false;
+    render();
+  }
+
+  function checkAnswer() {
+    const problem = PROBLEMS[state.order[state.idx]];
+    const placedWords = state.placed.map(p => p.word);
+    state.isCorrect = placedWords.length === problem.answer.length &&
+      placedWords.every((w, i) => w === problem.answer[i]);
+    state.isChecked = true;
+
+    // 初回判定の結果を記録
+    const problemKey = state.order[state.idx];
+    if (!(problemKey in state.results)) {
+      state.results[problemKey] = state.isCorrect ? 'correct' : 'wrong';
+    }
+    render();
+  }
+
+  function resetAnswer() {
+    state.available = [...state.available, ...state.placed];
+    state.placed = [];
+    state.isChecked = false;
+    state.isCorrect = false;
+    render();
+  }
+
+  function nextProblem() {
+    if (state.idx < state.order.length - 1) {
+      state.idx++;
+      loadProblem();
+    } else {
+      showSummary();
+    }
+  }
+
+  function prevProblem() {
+    if (state.idx > 0) {
+      state.idx--;
+      loadProblem();
+    }
+  }
+
+  function showSummary() {
+    const correctCount = Object.values(state.results).filter(r => r === 'correct').length;
+    const total = state.order.length;
+    const rate = Math.round((correctCount / total) * 100);
+    document.getElementById('sum-correct').textContent = correctCount;
+    document.getElementById('sum-total').textContent = total;
+    document.getElementById('sum-rate').textContent = `${rate}%`;
+    document.getElementById('summary-emoji').textContent =
+      rate === 100 ? '🏆' : rate >= 80 ? '🎉' : rate >= 60 ? '👍' : '💪';
+    document.getElementById('summary-title').textContent =
+      rate === 100 ? 'パーフェクト！' :
+      rate >= 80 ? '素晴らしい！' :
+      rate >= 60 ? 'よく頑張った！' : 'もう一度挑戦！';
+    document.getElementById('main-card').style.display = 'none';
+    document.getElementById('progress-wrap').style.display = 'none';
+    document.getElementById('summary-screen').classList.add('active');
+
+    // 間違えた問題がない場合は「まちがえた問題だけ」ボタンを非表示
+    const wrongIndices = state.order.filter(i => state.results[i] === 'wrong');
+    document.getElementById('btn-review').style.display =
+      wrongIndices.length > 0 ? '' : 'none';
+  }
+
+  function restart() {
+    initOrder();
+  }
+
+  function reviewWrong() {
+    const wrongIndices = state.order.filter(i => state.results[i] === 'wrong');
+    if (wrongIndices.length === 0) return;
+    initOrder(wrongIndices);
+  }
+
+  // ============ イベント ============
+  document.getElementById('btn-check').addEventListener('click', checkAnswer);
+  document.getElementById('btn-reset').addEventListener('click', resetAnswer);
+  document.getElementById('btn-next').addEventListener('click', nextProblem);
+  document.getElementById('btn-prev').addEventListener('click', prevProblem);
+
+  // キーボード
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.key === 'Enter') {
+      if (!document.getElementById('btn-next').disabled) {
+        nextProblem();
+      } else if (!document.getElementById('btn-check').disabled) {
+        checkAnswer();
+      }
+    }
+    if (e.key === 'Escape') resetAnswer();
+  });
+
+  // 初期化
+  initOrder();
+</script>
+
+</body>
+</html>

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+<base target="_top">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="description" content="Be Verb Check - 中1向け be動詞（am/is/are）判別ゲーム。iPad 単体起動版。">
@@ -19,8 +20,6 @@
    Foundation tokens (variables.css 同期領域より抜粋)
    ========================================================= */
 :root {
-  /* iframe対応：実viewport高さをJSで動的に注入。デフォルトは通常の100vh */
-  --vh: 100vh;
   --primary-color: #006064;
   --secondary-color: #00838F;
   --accent-color: #546E7A;
@@ -122,8 +121,6 @@ body {
   align-items: center;
   justify-content: center;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-  /* iframe埋め込み時の余白を、ゲーム画面と同じ暖色グラデーションで塗りつぶす */
-  background: var(--gym-color-bg-playground);
 }
 
 /* ----- 縦持ち時の案内 ----- */
@@ -185,7 +182,7 @@ body {
 }
 @media (max-height: 500px) {
   .game-container {
-    transform: scale(calc(var(--vh) / 460));
+    transform: scale(calc(100vh / 460));
     transform-origin: center center;
   }
 }
@@ -1179,19 +1176,6 @@ window.BE_VERB_QUESTIONS = [
       else el.classList.remove('active');
     });
   }
-})();
-</script>
-
-<!-- iframe対応：Google Sites埋め込み時、iframeの実高さを --vh に注入 -->
-<script>
-(function() {
-  function updateVh() {
-    // iframe内では window.innerHeight が iframe の高さになる
-    document.documentElement.style.setProperty('--vh', window.innerHeight + 'px');
-  }
-  updateVh();
-  window.addEventListener('resize', updateVh);
-  window.addEventListener('orientationchange', updateVh);
 })();
 </script>
 
